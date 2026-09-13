@@ -1,0 +1,172 @@
+/* SupplyChainIQ design tokens + foundation (F1).
+   Light-default enterprise theme: deep navy primary, steel secondary,
+   restrained copper accent. Semantic tokens only — pages must not hardcode colors. */
+
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap');
+
+:root {
+  /* primary: deep navy / midnight blue */
+  --primary: #1e40af;
+  --primary-hover: #1e3a8a;
+  --primary-muted: #dbeafe;
+  --on-primary: #ffffff;
+
+  /* secondary: cool steel blue */
+  --secondary: #3b82f6;
+  --secondary-muted: #eff6ff;
+
+  /* accent: restrained copper/amber — alerts, key highlights only */
+  --accent: #b45309;
+  --accent-muted: #fef3c7;
+  --on-accent: #ffffff;
+
+  /* status semantics */
+  --success: #15803d;
+  --success-muted: #dcfce7;
+  --warning: #b45309;
+  --warning-muted: #fef3c7;
+  --danger: #dc2626;
+  --danger-muted: #fee2e2;
+  --info: #1d4ed8;
+  --info-muted: #dbeafe;
+
+  /* surfaces */
+  --background: #f8fafc;
+  --surface: #ffffff;
+  --surface-muted: #eef2f7;
+  --surface-navy: #172554;
+  --on-navy: #ffffff;
+  --border: #dbe3ee;
+  --border-strong: #b6c2d6;
+
+  /* text */
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+
+  /* typography */
+  --font-sans: 'Fira Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Fira Code', ui-monospace, SFMono-Regular, monospace;
+  --text-page-title: 1.375rem;
+  --text-section-title: 1.0625rem;
+  --text-card-title: 0.9375rem;
+  --text-body: 0.875rem;
+  --text-secondary-size: 0.8125rem;
+  --text-caption: 0.75rem;
+  --text-metric: 1.625rem;
+  --text-table: 0.8125rem;
+  --text-nav: 0.875rem;
+  --leading-tight: 1.2;
+  --leading-body: 1.5;
+
+  /* spacing (4px base) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+
+  /* shape + depth (restrained: small radii, single shadow scale) */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --shadow-sm: 0 1px 2px rgb(15 23 42 / 0.06);
+  --shadow-md: 0 2px 8px rgb(15 23 42 / 0.08);
+
+  /* motion (fast, restrained) */
+  --transition-fast: 120ms ease;
+  --transition-med: 200ms ease;
+
+  /* layout */
+  --sidebar-width: 232px;
+  --sidebar-collapsed: 60px;
+  --topbar-height: 56px;
+  --content-max: 1200px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  color: var(--text-primary);
+  background: var(--background);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 {
+  font-size: var(--text-page-title);
+  line-height: var(--leading-tight);
+  font-weight: 700;
+  margin: 0 0 var(--space-4);
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  font-size: var(--text-section-title);
+  font-weight: 600;
+  margin: var(--space-6) 0 var(--space-3);
+}
+
+h3 {
+  font-size: var(--text-card-title);
+  font-weight: 600;
+  margin: 0 0 var(--space-2);
+}
+
+p {
+  margin: 0 0 var(--space-3);
+}
+
+small,
+.caption {
+  font-size: var(--text-caption);
+  color: var(--text-muted);
+}
+
+a {
+  color: var(--primary);
+}
+
+a:hover {
+  color: var(--primary-hover);
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--secondary);
+  outline-offset: 2px;
+}
+
+.metric {
+  font-size: var(--text-metric);
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.mono,
+td.n,
+.numeric {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

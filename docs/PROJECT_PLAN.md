@@ -17,21 +17,20 @@
 ## 2. Current Status
 
 ```text
-Current Phase: Phase 21 — Production Hardening COMPLETE (H1-H14)
-Current Milestone: Hardened web v1, full suite green, audit clean
-Overall Progress: 100%
+Current Phase: Phase 22 — Frontend Design & UX (F1 done, F2 next)
+Current Milestone: Token foundation live, shell next
+Overall Progress: 97%
 
 Completed:
 ✓ Phases 0-20 all COMPLETE incl. Phase 14 web app
 ✓ Phase 21 H1-H14 COMPLETE with regression tests per fix
-✓ Final audit: zero critical findings; K4/K5 + 4 accepted dev-only dep notes remain
+✓ Phase 22 F1 token foundation + ADR-010
 
 In Progress:
-→ None. Awaiting acceptance / remote push + tag
+→ F2 app shell
 
 Next:
-□ Push to remote + tag (needs remote URL)
-□ Optional: Redis limiter for multi-worker, Postgres prod run, .pbix assembly
+□ F3 component library → F4 login → F5/F6 page redesigns → F7/F8 QA
 
 Blockers:
 None
@@ -40,17 +39,17 @@ Last Updated:
 2026-09-14
 
 Last Completed Task:
-H14 final security audit — clean
+F1 design tokens + CSS foundation (build + 8 tests green)
 
 Next Concrete Task:
-Acceptance review (see Section 14 Next Action)
+F2 app shell (see Section 14 Next Action)
 ```
 
 | Metric | Value |
 |---|---|
-| Current phase | Phase 21 — Production Hardening COMPLETE |
-| Current milestone | Hardened web v1, audit clean |
-| Overall progress | 100% (all phases + H1-H14 with evidence) |
+| Current phase | Phase 22 — Frontend Design & UX (F1 done) |
+| Current milestone | Token foundation live, shell next |
+| Overall progress | 97% (F1 of F8 with evidence) |
 | Completed phases | Phases 0-21 COMPLETE 2026-09-14 |
 | Active phase | None (awaiting acceptance) |
 | Next phase | Acceptance (push/tag) + optional hardening follow-ups |
@@ -1023,6 +1022,51 @@ H1-H14 all [x] with evidence; final audit recorded; plan at 100%.
 
 ---
 
+### Phase 22 — Frontend Design & UX Transformation
+
+### Objective
+Transform the functional black-and-white prototype UI into a polished, modern SupplyChainIQ decision-intelligence product: navy/steel/copper identity, app shell, component system, SVG charts, page redesigns on real API data only. No backend behavior changes (at most 1-2 tiny read endpoints reusing existing logic); no fake KPIs; no new frameworks.
+
+### Prerequisites
+Phase 14 + 21 stable (API, auth, RBAC, CSRF, tests). ui-ux-pro-max design system adopted (Data-Dense Dashboard; #1E40AF/#3B82F6/#D97706; Fira Sans/Code).
+
+### Tasks
+F1 tokens + CSS foundation + typography + ADR-010. F2 app shell (topbar/sidebar/nav/role-awareness/responsive). F3 component library + SVG charts + icons + skeletons/empty/error. F4 branded login. F5 overview/inventory/suppliers/logistics/forecasts redesign. F6 risks/recs/sources/ETL/quality/admin redesign. F7 responsive + a11y QA (1440/1280/1024/768/390, keyboard, contrast, reduced motion). F8 visual + functional regression + docs.
+
+### Deliverables
+* Themed SPA (theme.css + components + pages), rebuilt dist
+* Browser screenshots per phase as evidence
+* Updated docs (design notes where useful)
+
+### Files
+* Create: `frontend/src/theme.css`, `frontend/src/components/*`, `frontend/src/charts.jsx`, `frontend/src/icons.jsx`
+* Modify: `frontend/src/main.jsx`, `pages.jsx`, `Login.jsx`, `hooks.jsx`
+* Possibly add (only if needed): 1-2 read endpoints reusing analytics/ (trend aggregation, ABC)
+* Tests: `tests/test_frontend_tokens.py` + per-task static gates; existing suite stays green
+
+### Technologies
+React 18 + Vite (existing); hand-rolled CSS/SVG per ADR-010; agent-browser visual QA.
+
+### Tests
+* Static contract tests (tokens, a11y gates, no-hardcoded-color rule as pages migrate)
+* `npm run build` green per task; backend suite green (untouched behavior)
+* Browser walk + screenshots per redesign task
+
+### Acceptance Criteria
+* Directive §42: recognizable identity, strong dashboard hierarchy, reusable KPIs/charts/tables/forms/states, polished auth, RBAC-aware UI, responsive + a11y fundamentals, zero functionality loss, zero fake data, plan updated.
+
+### Risks
+* Big-bang restyle breaking flows. Mitigate: one task at a time, workflow test + browser walk per task.
+* Chart scope creep. Mitigate: 3 primitives max (line/bar/sparkline).
+
+### Dependencies
+Phases 14, 21.
+
+### Definition of Done
+F1-F8 all [x] with screenshots + green builds; §42 met; plan at 100%.
+
+---
+
 ## 4. TASK TRACKER
 
 Use `- [ ]` not started, `- [x]` completed, `- [~]` in progress, `- [!]` blocked.
@@ -1369,6 +1413,19 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Sweeps: no token storage/JWT/wildcard-CORS/debug flags in src (node_modules hits are third-party scroll/debug libs, not our code); no string-formatted SQL (f-strings carry fixed keywords only, values parameterized); no secret assignments or secret logging; str(e) details are controlled validation strings; every route covered by require_perm/current_user/CsrfChecked (login intentionally public). Full suite green (see below).
 
+### Phase 22 — Frontend Design & UX Transformation
+- [x] F1 design tokens + CSS foundation + typography
+
+  Completed: 2026-09-14. Files: frontend/src/theme.css (semantic tokens per §5, type scale, spacing, restrained shape/motion, focus + reduced-motion), main.jsx (wired), docs/decisions.md (ADR-010 hand-rolled CSS/SVG, light-default), tests/test_frontend_tokens.py. Validation: 3 token tests green; `npm run build` green.
+
+- [ ] F2 app shell (topbar/sidebar/nav/role-awareness/responsive)
+- [ ] F3 component library + SVG charts + icons
+- [ ] F4 branded login
+- [ ] F5 overview/inventory/suppliers/logistics/forecasts redesign
+- [ ] F6 risks/recs/sources/ETL/quality/admin redesign
+- [ ] F7 responsive + a11y QA
+- [ ] F8 visual + functional regression + docs
+
 ## Change Log
 
 ### 2026-09-13
@@ -1460,6 +1517,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 - Final sweeps: no token storage/JWT/wildcard/debug in src; no formatted SQL; no secret logging; all routes authorized; str(e) details controlled.
 - Phase 21 COMPLETE. Overall 100%.
 
+### 2026-09-14 (F1 design tokens)
+- theme.css semantic tokens + type/spacing/shape/motion scales; Fira progressive-enhancement fonts; focus + reduced-motion; ADR-010 (hand-rolled CSS/SVG, light-default).
+- Evidence: 3 token tests green; `npm run build` green. Phase 22 opened (F1/8).
+
 ## 6. ARCHITECTURE DECISIONS
 
 ### ADR-001 — PostgreSQL as Warehouse (APPROVED)
@@ -1547,8 +1608,9 @@ Update this log on every significant change. Never silently change architecture.
 | Phase 19 — Documentation | Complete | 100% |
 | Phase 20 — Final Validation & Demo | Complete | 100% |
 | Phase 21 — Production Hardening | Complete | 100% |
+| Phase 22 — Frontend Design & UX | In progress (F1 done) | 12% |
 
-Overall: 100%. Based on completed tasks only, not estimation.
+Overall: 97%. Based on completed tasks only, not estimation.
 
 ## 8. TEST STATUS
 
@@ -1643,19 +1705,19 @@ Process: for every blocker record problem, impact, cause, possible solutions, cu
 
 The next concrete task is:
 
-> Acceptance review: push to remote + tag (needs remote URL), or pick follow-ups (Redis limiter, Postgres prod run, .pbix assembly).
+> F2 app shell: topbar + grouped sidebar + role-aware nav + responsive structure.
 
 Reason:
 
-> Phases 0-21 COMPLETE with evidence: 89-test suite green, browser E2E green, audit clean, K4/K5 + accepted dep notes documented.
+> Tokens exist but no page consumes them yet. The shell gives every later task its layout, navigation, and identity frame.
 
 Prerequisites:
 
-> None. Remote URL needed only for push/tag.
+> F1 done. No page redesigns in this task.
 
 Expected result:
 
-> Acceptance recorded in Change Log, or new task queued with its own acceptance criteria.
+> Shell renders on all routes with active states and role-aware items; build green; screenshot evidence.
 ```
 
 ---

@@ -83,3 +83,13 @@ Alternatives: keep signed cookies (rejected — no revocation); JWT bearer (reje
 Reason: Directive §§2-5 require revocable server-side sessions and CSRF for cookie auth with minimal new dependencies (stdlib + existing stack).
 
 Consequences: sessions + csrf_token columns (migrated), login/logout shapes unchanged, 8 mutating routes carry CsrfChecked, frontend sends header automatically.
+
+## ADR-010 — Hand-rolled CSS/SVG frontend, light-default (APPROVED 2026-09-14)
+
+Decision: No Tailwind, no chart library, no icon library. One `theme.css` token foundation (semantic custom properties), hand-rolled SVG charts (line/bar/sparkline), inline SVG icon set. Light-default theme; dark mode deferred. Fira Sans/Code via progressive-enhancement @import with system fallback (offline-safe).
+
+Alternatives: Tailwind (rejected — nothing exists to integrate with; 170KB bundle stays lean; directive allows hand-rolled), recharts (rejected — 4 simple chart types don't justify ~100KB+), Phosphor/Heroicons (rejected — 12 nav + status icons hand-drawn inline, zero dep).
+
+Reason: Smallest sufficient tooling for a 12-page operational UI; full token control; no new supply-chain risk (see H11).
+
+Consequences: All color/spacing/typography via tokens; pages must not hardcode hex; UX static tests enforce the contract.
