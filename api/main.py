@@ -17,6 +17,7 @@ from .routes.logistics import router as logistics_router
 from .routes.overview import router as overview_router
 from .routes.recommendations import router as recommendations_router
 from .routes.risks import router as risks_router
+from .routes.sources import router as sources_router
 from .routes.suppliers import router as suppliers_router
 
 
@@ -40,6 +41,7 @@ def create_app() -> FastAPI:
     app.include_router(overview_router)
     app.include_router(recommendations_router)
     app.include_router(risks_router)
+    app.include_router(sources_router)
     app.include_router(suppliers_router)
     return app
 

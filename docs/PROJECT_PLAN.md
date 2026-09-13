@@ -1170,7 +1170,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: api/services/recommendations.py (reorder with stock/forecast/safety/lead/risk/qty, transfer surplus→deficit, preferred supplier with risk-adjusted cost basis), api/routes/recommendations.py, tests/test_api_recommendations.py. Validation: zero-stock fixture yields reorder with all 8 explanation keys; supplier pick cites OTIF basis.
 
-- [ ] 14.13 Data sources (+ guarded upload)
+- [x] 14.13 Data sources (+ guarded upload)
+
+  Completed: 2026-09-14. Files: api/services/sources.py (14 sources, required-column contracts, 10MB cap, stage-only), api/routes/sources.py, tests/test_api_sources.py, requirements.txt (+python-multipart, uvicorn version corrected to 0.52.4). Validation: status reflects runs, valid upload staged, bad schema 422, analyst upload 403.
+
 - [ ] 14.14 ETL monitoring (+ guarded trigger)
 - [ ] 14.15 Data quality monitoring
 - [ ] 14.16 Alerts center
