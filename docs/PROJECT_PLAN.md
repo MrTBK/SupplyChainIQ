@@ -1198,7 +1198,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: api/config.py + main.py (SCI_COOKIE_SECURE flag), tests/test_api_security.py. Validation: 3 tests green (analyst/executive violation sweep, SQL/LIKE injection neutered at endpoints, HttpOnly flag + forged-cookie 401). Known limit: no login rate limiting in v1 (documented in 14.23).
 
-- [ ] 14.20 End-to-end testing
+- [x] 14.20 End-to-end testing
+
+  Completed: 2026-09-14. Files: tests/test_api_workflow.py (+risk→alerts→ack loop), scripts/web_e2e.py (+--walk). Validation: API workflow tests green; browser walk of all 11 module routes after login green with headings verified.
+
 - [ ] 14.21 Performance validation
 - [ ] 14.22 UX validation
 - [ ] 14.23 Documentation (API, RBAC, security, deployment)

@@ -94,6 +94,8 @@ def main() -> None:
     ap.add_argument("--api-port", type=int, default=8001)
     ap.add_argument("--signin", action="store_true",
                     help="complete the login flow in the browser and capture the overview")
+    ap.add_argument("--walk", action="store_true",
+                    help="after signin, visit every module route and verify its heading (full E2E)")
     a = ap.parse_args()
     global API_PORT
     API_PORT = a.api_port
@@ -123,6 +125,19 @@ def main() -> None:
             subprocess.run(["agent-browser", "screenshot", str(REPO / "reports" / "web-overview.png")],
                            check=True)
             print("signed in, overview captured")
+        if a.walk:
+            if not a.signin:
+                raise SystemExit("--walk requires --signin")
+            routes = ["/inventory", "/suppliers", "/logistics", "/forecasts", "/risks",
+                      "/recommendations", "/sources", "/etl", "/quality", "/alerts", "/admin"]
+            for route in routes:
+                subprocess.run(["agent-browser", "open", base + route], check=True)
+                subprocess.run(["agent-browser", "wait", "--load", "networkidle"], check=True)
+                snap = subprocess.run(["agent-browser", "snapshot", "-i", "-c"], check=True,
+                                      capture_output=True, text=True)
+                assert "<h1>" in snap.stdout or "heading" in snap.stdout, route
+                print(f"walk ok {route}")
+            print(f"walked {len(routes)} module routes")
         print("done. Serve in your own browser at", base)
     finally:
         srv.shutdown()

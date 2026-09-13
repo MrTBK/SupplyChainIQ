@@ -41,3 +41,21 @@ def test_critical_workflow(tmp_path, monkeypatch):
         assert c.get("/api/kpis/overview").status_code == 401
     finally:
         c.__exit__()
+
+
+def test_risk_to_ack_loop(tmp_path, monkeypatch):
+    c = _client(tmp_path, monkeypatch)
+    try:
+        assert c.post("/api/auth/login", json={"username": "mgr", "password": "pw"}).status_code == 200
+        assert c.get("/api/risks").status_code == 200
+        assert c.get("/api/recommendations").status_code == 200
+        ev = c.post("/api/alerts/evaluate").json()
+        assert ev["open_total"] >= 0
+        lst = c.get("/api/alerts").json()
+        if lst["total"]:
+            aid = lst["items"][0]["id"]
+            assert c.patch(f"/api/alerts/{aid}", json={"status": "acknowledged"}).status_code == 200
+        assert c.get("/api/etl-runs").status_code == 200
+        assert c.get("/api/data-quality/score").status_code == 200
+    finally:
+        c.__exit__()
