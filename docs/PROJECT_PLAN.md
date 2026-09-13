@@ -1194,7 +1194,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: frontend/src/hooks.jsx + Login.jsx + pages.jsx (12 modules wired) + main.jsx (session guard), tests/test_api_workflow.py, scripts/web_e2e.py (same-origin proxy + agent-browser login flow). Validation: workflow test green (login→overview→inventory→product→forecast→recommendation→logout→401); `npm run build` green; browser E2E screenshots show Sign in → Executive overview with live numbers (fixed './hooks.jsx' import found by build).
 
-- [ ] 14.19 Security testing
+- [x] 14.19 Security testing
+
+  Completed: 2026-09-14. Files: api/config.py + main.py (SCI_COOKIE_SECURE flag), tests/test_api_security.py. Validation: 3 tests green (analyst/executive violation sweep, SQL/LIKE injection neutered at endpoints, HttpOnly flag + forged-cookie 401). Known limit: no login rate limiting in v1 (documented in 14.23).
+
 - [ ] 14.20 End-to-end testing
 - [ ] 14.21 Performance validation
 - [ ] 14.22 UX validation
