@@ -1329,7 +1329,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: api/cors.py (same-origin default, exact-origin opt-in, wildcard refused), api/main.py (wired), tests/test_security_cors.py. Validation: 3 tests green (no ACAO by default, opt-in reflected with tight methods/headers, evil origin ignored, wildcard raises).
 
-- [ ] H5 security headers middleware
+- [x] H5 security headers middleware
+
+  Completed: 2026-09-14. Files: api/headers.py (nosniff/referrer/permissions/strict-CSP always; HSTS iff COOKIE_SECURE), api/main.py (wired), tests/test_security_headers.py. Validation: 2 tests green (matrix + conditional HSTS); suite 74 passed.
+
 - [ ] H6 upload hardening (MIME, traversal tests, row/column caps)
 - [ ] H7 audit expansion (LOGIN/FAILED/LOGOUT/ETL/upload events)
 - [ ] H8 observability (request IDs, structured log, readiness probe)

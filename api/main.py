@@ -9,6 +9,7 @@ from .alerts import init_alerts_schema
 from .auth import seed_admin
 from .cors import apply_cors
 from .foundation import http_exception_handler, unhandled_handler
+from .headers import SecurityHeadersMiddleware
 from .routes.admin import router as admin_router
 from .routes.alerts import router as alerts_router
 from .routes.auth import router as auth_router
@@ -32,6 +33,7 @@ def create_app() -> FastAPI:
     from .users import init_admin_schema
     init_admin_schema()
     app = FastAPI(title="SupplyChainIQ API", version="0.1.0")
+    app.add_middleware(SecurityHeadersMiddleware)
     apply_cors(app)
     app.add_exception_handler(HTTPException, http_exception_handler)
     app.add_exception_handler(StarletteHTTPException, http_exception_handler)
