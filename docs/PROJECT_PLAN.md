@@ -1202,7 +1202,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: tests/test_api_workflow.py (+risk→alerts→ack loop), scripts/web_e2e.py (+--walk). Validation: API workflow tests green; browser walk of all 11 module routes after login green with headings verified.
 
-- [ ] 14.21 Performance validation
+- [x] 14.21 Performance validation
+
+  Completed: 2026-09-14. Files: tests/test_api_perf.py, docs/performance.md (web section). Validation: 2 tests green (all list endpoints bounded ≤500, SQL-aggregation guardrail); measured 1.9-27.5ms across 10 endpoints on demo DB.
+
 - [ ] 14.22 UX validation
 - [ ] 14.23 Documentation (API, RBAC, security, deployment)
 - [ ] 14.24 Web application release gate
