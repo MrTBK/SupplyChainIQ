@@ -1129,8 +1129,12 @@ A task is complete only when acceptance criteria are satisfied and validated. No
   Completed: 2026-09-14. Files: api/__init__.py, api/config.py, api/db.py (warehouse read-only + app.db), api/main.py (app factory + /api/health), tests/test_api_health.py, frontend/ (package.json, vite.config with /api proxy, index.html, src/api.js, App.jsx nav for 12 modules, main.jsx), requirements.txt (+fastapi/uvicorn/httpx/itsdangerous), .gitignore (node_modules/dist). Validation: health test green; `npm run build` succeeds (33 modules). 2 warnings are third-party starlette deprecations, zero failures.
 
 - [ ] 14.3 Authentication foundation (sessions)
-- [ ] 14.3 Authentication foundation (sessions)
+- [x] 14.3 Authentication foundation (sessions)
+
+  Completed: 2026-09-14. Files: api/auth.py (PBKDF2 stdlib, 200k iters, per-user salt), api/routes/auth.py (login/logout/me), api/main.py (router + admin seed), tests/test_api_auth.py. Validation: 3 auth tests green (roundtrip, login→me→logout→401, bad-credential 401s). Login UI deferred to 14.18.
+
 - [ ] 14.4 RBAC
+- [ ] 14.5 API foundation (errors, pagination, read-only analytics access)
 - [ ] 14.5 API foundation (errors, pagination, read-only analytics access)
 - [ ] 14.6 Executive overview module
 - [ ] 14.7 Inventory module (+ product drill)
