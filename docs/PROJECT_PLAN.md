@@ -1325,7 +1325,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: api/csrf.py (double-submit, session-bound, compare_digest, safe methods exempt), api/sessions.py (csrf_token column + migration, fail-closed), api/routes/auth.py (dual-cookie login/logout), CsrfChecked on all 8 mutating routes, frontend/src/api.js (auto header), tests/test_security_csrf.py, 7 older tests updated to new flow. Validation: 3 CSRF tests green (missing/wrong/stale-token 403s, login exempt, GETs unaffected); suite 69 passed.
 
-- [ ] H4 explicit CORS policy
+- [x] H4 explicit CORS policy
+
+  Completed: 2026-09-14. Files: api/cors.py (same-origin default, exact-origin opt-in, wildcard refused), api/main.py (wired), tests/test_security_cors.py. Validation: 3 tests green (no ACAO by default, opt-in reflected with tight methods/headers, evil origin ignored, wildcard raises).
+
 - [ ] H5 security headers middleware
 - [ ] H6 upload hardening (MIME, traversal tests, row/column caps)
 - [ ] H7 audit expansion (LOGIN/FAILED/LOGOUT/ETL/upload events)
