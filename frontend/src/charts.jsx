@@ -60,7 +60,7 @@ export function LineChart({ title, series, labels, projectionFrom, height = 220,
   const n = Math.max(...series.map((s) => s.values.length))
   const x = (i) => pad.l + ((w - pad.l - pad.r) * i) / Math.max(1, n - 1)
   const y = (v) => h - pad.b - ((h - pad.t - pad.b) * v) / max
-  const path = (vals) => vals.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ')
+  const path = (vals, offset = 0) => vals.map((v, i) => `${i ? 'L' : 'M'}${x(offset + i).toFixed(1)},${y(v).toFixed(1)}`).join(' ')
   const step = Math.max(1, Math.ceil(n / 8))
   return (
     <ChartFrame title={title} legend={[[TOKENS.primary, 'Actual'], ...(projectionFrom != null ? [[TOKENS.accent, 'Projection']] : [])]}>
@@ -73,7 +73,7 @@ export function LineChart({ title, series, labels, projectionFrom, height = 220,
             <g key={si}>
               <path d={path(s.values.slice(0, cut))} fill="none" stroke={C_LINE} strokeWidth="2" />
               {projectionFrom != null && (
-                <path d={path(s.values.slice(cut - 1))} fill="none" stroke={C_PROJ} strokeWidth="2" strokeDasharray="5 3" />
+                <path d={path(s.values.slice(cut - 1), cut - 1)} fill="none" stroke={C_PROJ} strokeWidth="2" strokeDasharray="5 3" />
               )}
               {s.values.map((v, i) => (
                 <circle key={i} cx={x(i)} cy={y(v)} r={i % step === 0 ? 2.4 : 0} fill={i >= cut - (projectionFrom != null ? 1 : 0) && projectionFrom != null ? C_PROJ : C_LINE}>

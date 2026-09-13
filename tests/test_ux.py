@@ -10,7 +10,7 @@ def test_every_page_has_heading_and_purpose():
     for name in ["Overview", "Inventory", "Suppliers", "Logistics", "Forecasts", "Risks",
                  "Recommendations", "Sources", "Etl", "Quality", "Alerts", "Admin"]:
         assert f"export function {name}" in pages, name
-    assert pages.count("<h1>") >= 12
+    assert pages.count("<h1>") + pages.count("<PageHeader") >= 12
 
 
 def test_tables_accessible_and_scrollable():

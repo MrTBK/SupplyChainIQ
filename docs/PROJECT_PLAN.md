@@ -1430,7 +1430,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: frontend/src/Login.jsx (navy brand panel + capabilities + component form), login.css (responsive stack), icons.jsx (shared BrandMark), Shell.jsx (dedupe). Validation: build green; browser screenshot shows branded split card; all login states preserved.
 
-- [ ] F5 overview/inventory/suppliers/logistics/forecasts redesign
+- [x] F5 overview/inventory/suppliers/logistics/forecasts redesign
+
+  Completed: 2026-09-14. Backend: api/services/demand.py + routes/demand.py (GET /api/demand/trend, SQL-aggregated, bounded months) + test — the single justified read addition. Frontend: pages.jsx rewritten (KPI rows, Line/Bar/SVG charts, bands + badges, sortable DataTables, filters, drill panel, skeletons/empty states). Validation: demand test green; build green; 5 browser screenshots reviewed; visual QA found + fixed LineChart projection misalignment (absolute indexing).
+
 - [ ] F6 risks/recs/sources/ETL/quality/admin redesign
 - [ ] F7 responsive + a11y QA
 - [ ] F8 visual + functional regression + docs

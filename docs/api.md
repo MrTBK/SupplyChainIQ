@@ -15,6 +15,7 @@ Base: same origin `/api` (Vite proxies to `:8000` in dev). Auth: session cookie 
 | GET /api/logistics/summary | ops:read | — | OTD, avg/p90 delay, by carrier/region |
 | GET /api/logistics/late | ops:read | paging | late deliveries, worst delay first |
 | GET /api/forecasts | ops:read | ?product ?category ?warehouse ?horizon(1-3) | history + model + WAPE + projection + note |
+| GET /api/demand/trend | ops:read | ?months (1-24) | monthly qty + revenue + top-5 categories |
 | GET /api/risks | ops:read | ?kind ?severity | severity/entity/time/reason/metrics/action |
 | GET /api/recommendations | ops:read | ?product ?kind | reorder/transfer/supplier with full WHY |
 | GET /api/data-sources | ops:read | — | 14 sources: status, runs, watermark, columns |

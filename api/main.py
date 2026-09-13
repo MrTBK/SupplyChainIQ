@@ -20,6 +20,7 @@ from .observability import REQUEST_ID_HEADER, ObservabilityMiddleware
 from .routes.admin import router as admin_router
 from .routes.alerts import router as alerts_router
 from .routes.auth import router as auth_router
+from .routes.demand import router as demand_router
 from .routes.etl_runs import router as etl_runs_router
 from .routes.forecasts import router as forecasts_router
 from .routes.inventory import router as inventory_router
@@ -84,6 +85,7 @@ def create_app() -> FastAPI:
     app.include_router(admin_router)
     app.include_router(alerts_router)
     app.include_router(auth_router)
+    app.include_router(demand_router)
     app.include_router(etl_runs_router)
     app.include_router(forecasts_router)
     app.include_router(inventory_router)
