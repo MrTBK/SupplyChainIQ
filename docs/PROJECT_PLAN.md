@@ -1162,7 +1162,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: api/services/forecasts.py (history + best-baseline projection 1-3m with model/wape/note), api/routes/forecasts.py, tests/test_api_forecasts.py. Validation: labels present, horizon respected, filters work, empty-set shape stable.
 
-- [ ] 14.11 Risk center (requires alerts table)
+- [x] 14.11 Risk center (requires alerts table)
+
+  Completed: 2026-09-14. Files: api/services/risks.py (live evaluation: stockout/coverage, supplier OTIF, carrier OTD, demand 3-sigma), api/routes/risks.py, tests/test_api_risks.py. Validation: full 7-key explanation per risk, stockout forced case detected, severity filter works. Persistence/ack deferred to 14.16.
+
 - [ ] 14.12 Recommendations (explainable only)
 - [ ] 14.13 Data sources (+ guarded upload)
 - [ ] 14.14 ETL monitoring (+ guarded trigger)
