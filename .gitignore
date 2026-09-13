@@ -22,6 +22,10 @@ data/*.sqlite*
 ~$*.pbix
 *.tmp
 
+# Generated demo report outputs (reproduce via scripts/make_report.py)
+reports/demo.html
+reports/demo-screenshot.png
+
 # OS / editor
 .DS_Store
 .vscode/

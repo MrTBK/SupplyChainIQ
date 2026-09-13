@@ -1205,6 +1205,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 - Known: business keys are not seed-namespaced, so loading seed-7 into a DB already holding seed-42 is absorbed by idempotency (overlapping keys ignored by design). Use a fresh DB file per seed for isolated demos.
 - README quickstart updated.
 
+### 2026-09-13 (web demo report)
+- Added scripts/make_report.py (static SYNTHETIC KPI report from marts, stdlib only) + scripts/open_demo.py (serve + verify in real browser via agent-browser). Verified with screenshot: executive cards, category/supplier/carrier tables render correctly.
+- ADR-007 holds: static export for demo, not a web app. Generated outputs (reports/demo.html, screenshot) are git-ignored; regenerate anytime.
+
 ## 6. ARCHITECTURE DECISIONS
 
 ### ADR-001 — PostgreSQL as Warehouse (APPROVED)
