@@ -1,16 +1,63 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { get, post } from './api.js'
 
 export function useApi(path, params) {
   const [data, setData] = useState(null)
   const [error, setError] = useState(null)
+  const [status, setStatus] = useState(null)
   const qs = params ? '?' + new URLSearchParams(params).toString() : ''
   useEffect(() => {
     setData(null)
     setError(null)
-    get(path + qs).then(setData).catch((e) => setError(e.message))
+    setStatus(null)
+    get(path + qs).then(setData).catch((e) => {
+      setError(e.message)
+      setStatus(e.status || null)
+    })
   }, [path + qs]);
-  return { data, error }
+  return { data, error, status }
+}
+
+export function ErrorPanel({ error, status }) {
+  if (status === 403) {
+    return (
+      <div role="alert" style={{ border: '1px solid #b00', padding: '0.75rem', borderRadius: 4 }}>
+        <b>403 — Not permitted.</b>
+        <p>Your role cannot access this. Contact an administrator if you need it.</p>
+      </div>
+    )
+  }
+  return <p role="alert">Error: {error}</p>
+}
+
+export function NotFound() {
+  return (
+    <>
+      <h1>404 — Not found</h1>
+      <p>This page does not exist. Use the navigation to continue.</p>
+    </>
+  )
+}
+
+export class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = { failed: false }
+  }
+  static getDerivedStateFromError() {
+    return { failed: true }
+  }
+  render() {
+    if (this.state.failed) {
+      return (
+        <div role="alert">
+          <h1>Something went wrong</h1>
+          <p>Reload the page. If it persists, contact an administrator.</p>
+        </div>
+      )
+    }
+    return this.props.children
+  }
 }
 
 export function Table({ cols, rows }) {

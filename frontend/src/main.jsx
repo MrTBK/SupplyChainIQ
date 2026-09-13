@@ -2,7 +2,7 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom'
 import Login from './Login.jsx'
-import { useSession } from './hooks.jsx'
+import { NotFound, ErrorBoundary, useSession } from './hooks.jsx'
 import { Admin, Alerts, Etl, Forecasts, Inventory, Logistics, Overview, Quality, Recommendations, Risks, Sources, Suppliers } from './pages.jsx'
 
 const ROUTES = [
@@ -36,9 +36,12 @@ function Shell() {
         </ul>
       </nav>
       <main style={{ flex: 1, padding: '1rem 1.5rem' }}>
+        <ErrorBoundary>
         <Routes>
           {ROUTES.map(([path, , el]) => <Route key={path} path={path} element={el} />)}
+          <Route path="*" element={<NotFound />} />
         </Routes>
+        </ErrorBoundary>
       </main>
     </div>
   )

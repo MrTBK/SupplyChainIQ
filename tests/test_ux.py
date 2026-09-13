@@ -35,3 +35,18 @@ def test_no_decorative_excess():
         text = p.read_text().lower()
         for bad in ["linear-gradient", "box-shadow", "animation", "keyframes"]:
             assert bad not in text, (f, bad)
+
+
+def test_security_ux_contract():
+    api = (SRC / "api.js").read_text()
+    assert "body.error" in api and "ApiError" in api  # envelope parsed, status typed
+    assert "localStorage" not in api and "sessionStorage" not in api  # no token storage
+    assert "X-CSRF-Token" in api
+    hooks = (SRC / "hooks.jsx").read_text()
+    assert "ErrorBoundary" in hooks and "NotFound" in hooks and "403" in hooks
+    main = (SRC / "main.jsx").read_text()
+    assert 'path="*"' in main  # unknown routes render 404, never blank
+    login = (SRC / "Login.jsx").read_text()
+    assert "disabled={busy}" in login and "Show" in login  # loading + visibility toggle
+    for f in ["api.js", "hooks.jsx", "pages.jsx", "Login.jsx", "main.jsx"]:
+        assert "console.log" not in (SRC / f).read_text(), f  # no response leakage to console

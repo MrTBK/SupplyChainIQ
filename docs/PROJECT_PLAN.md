@@ -1345,7 +1345,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: api/observability.py (X-Request-ID echo/generate, method/path/status/duration/uid log, no bodies/headers/cookies), api/main.py (/api/ready with app+warehouse checks), tests/test_security_observability.py. Validation: 3 tests green (unique IDs, secret-free logs incl. password login, readiness shape); suite 84 passed.
 
-- [ ] H9 frontend security/UX fixes (envelope parsing, 403/404, login states)
+- [x] H9 frontend security/UX fixes (envelope parsing, 403/404, login states)
+
+  Completed: 2026-09-14. Files: frontend/src/api.js (ApiError with status from envelope, CSRF auto-header kept), hooks.jsx (useApi status, ErrorPanel 403 vs generic, NotFound, ErrorBoundary), Login.jsx (loading/disabled/visibility/autocomplete), pages.jsx (ErrorPanel everywhere), main.jsx (ErrorBoundary + * route). Validation: 5 static UX-security tests green; build green; browser login with new UI signs in to overview.
+
 - [ ] H10 secrets/config review
 - [ ] H11 dependency review
 - [ ] H12 deployment guards (body-size, dev-vs-prod)
@@ -1428,6 +1431,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 ### 2026-09-14 (H8 observability)
 - Request IDs, secret-free access log, /api/ready vs /api/health split.
 - Evidence: 3 tests green; suite 84 passed.
+
+### 2026-09-14 (H9 frontend fixes)
+- Envelope bug fixed (was showing raw API codes), 403/404 states, hardened login, error boundary, no console leakage.
+- Evidence: 5 UX-security tests green; build green; browser sign-in verified.
 
 ## 6. ARCHITECTURE DECISIONS
 

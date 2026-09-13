@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-import { Table, useApi } from './hooks.jsx'
+import { ErrorPanel, Table, useApi } from './hooks.jsx'
 
 export function Overview() {
-  const { data, error } = useApi('/api/kpis/overview')
-  if (error) return <p>Error: {error}</p>
+  const { data, error, status } = useApi('/api/kpis/overview')
+  if (error) return <ErrorPanel error={error} status={status} />
   if (!data) return <p>Loading…</p>
   return (
     <>
@@ -16,8 +16,8 @@ export function Overview() {
 
 export function Inventory() {
   const [q, setQ] = useState('')
-  const { data, error } = useApi('/api/inventory', { search: q, limit: 50 })
-  if (error) return <p>Error: {error}</p>
+  const { data, error, status } = useApi('/api/inventory', { search: q, limit: 50 })
+  if (error) return <ErrorPanel error={error} status={status} />
   return (
     <>
       <h1>Inventory</h1>
@@ -33,8 +33,8 @@ export function Inventory() {
 }
 
 export function Suppliers() {
-  const { data, error } = useApi('/api/suppliers', { ordering: '-score' })
-  if (error) return <p>Error: {error}</p>
+  const { data, error, status } = useApi('/api/suppliers', { ordering: '-score' })
+  if (error) return <ErrorPanel error={error} status={status} />
   if (!data) return <p>Loading…</p>
   return (
     <>
@@ -45,9 +45,9 @@ export function Suppliers() {
 }
 
 export function Logistics() {
-  const { data, error } = useApi('/api/logistics/summary')
+  const { data, error, status } = useApi('/api/logistics/summary')
   const late = useApi('/api/logistics/late', { limit: 20 })
-  if (error) return <p>Error: {error}</p>
+  if (error) return <ErrorPanel error={error} status={status} />
   if (!data) return <p>Loading…</p>
   return (
     <>
@@ -65,8 +65,8 @@ export function Logistics() {
 
 export function Forecasts() {
   const [product, setProduct] = useState('')
-  const { data, error } = useApi('/api/forecasts', { product, horizon: 3, limit: 20 })
-  if (error) return <p>Error: {error}</p>
+  const { data, error, status } = useApi('/api/forecasts', { product, horizon: 3, limit: 20 })
+  if (error) return <ErrorPanel error={error} status={status} />
   return (
     <>
       <h1>Forecasts</h1>
@@ -83,8 +83,8 @@ export function Forecasts() {
 }
 
 export function Risks() {
-  const { data, error } = useApi('/api/risks')
-  if (error) return <p>Error: {error}</p>
+  const { data, error, status } = useApi('/api/risks')
+  if (error) return <ErrorPanel error={error} status={status} />
   if (!data) return <p>Loading…</p>
   return (
     <>
@@ -95,8 +95,8 @@ export function Risks() {
 }
 
 export function Recommendations() {
-  const { data, error } = useApi('/api/recommendations')
-  if (error) return <p>Error: {error}</p>
+  const { data, error, status } = useApi('/api/recommendations')
+  if (error) return <ErrorPanel error={error} status={status} />
   if (!data) return <p>Loading…</p>
   return (
     <>
@@ -107,8 +107,8 @@ export function Recommendations() {
 }
 
 export function Sources() {
-  const { data, error } = useApi('/api/data-sources')
-  if (error) return <p>Error: {error}</p>
+  const { data, error, status } = useApi('/api/data-sources')
+  if (error) return <ErrorPanel error={error} status={status} />
   if (!data) return <p>Loading…</p>
   return (
     <>
@@ -119,8 +119,8 @@ export function Sources() {
 }
 
 export function Etl() {
-  const { data, error } = useApi('/api/etl-runs', { limit: 20 })
-  if (error) return <p>Error: {error}</p>
+  const { data, error, status } = useApi('/api/etl-runs', { limit: 20 })
+  if (error) return <ErrorPanel error={error} status={status} />
   if (!data) return <p>Loading…</p>
   return (
     <>
@@ -149,8 +149,8 @@ export function Quality() {
 }
 
 export function Alerts() {
-  const { data, error } = useApi('/api/alerts')
-  if (error) return <p>Error: {error}</p>
+  const { data, error, status } = useApi('/api/alerts')
+  if (error) return <ErrorPanel error={error} status={status} />
   if (!data) return <p>Loading…</p>
   return (
     <>

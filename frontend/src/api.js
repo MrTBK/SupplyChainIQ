@@ -1,8 +1,16 @@
 // API client: all data flows through the backend. No direct DB access.
 // Mutations automatically carry the CSRF token (double-submit cookie set at login).
+// Errors carry .status so UI routes 401->login, 403->forbidden (never everything->login).
 function csrfToken() {
   const m = document.cookie.match(/(?:^|; )sci_csrf=([^;]*)/)
   return m ? decodeURIComponent(m[1]) : null
+}
+
+export class ApiError extends Error {
+  constructor(status, message) {
+    super(message)
+    this.status = status
+  }
 }
 
 export async function api(path, opts = {}) {
@@ -15,7 +23,8 @@ export async function api(path, opts = {}) {
   const r = await fetch(path, { credentials: 'same-origin', headers, ...opts })
   if (!r.ok) {
     const body = await r.json().catch(() => ({}))
-    throw new Error(body.detail || `API ${r.status} on ${path}`)
+    const message = (body.error && body.error.message) || `API ${r.status} on ${path}`
+    throw new ApiError(r.status, message)
   }
   return r.json()
 }
