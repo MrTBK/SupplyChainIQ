@@ -1158,7 +1158,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: api/services/logistics.py (OTD, avg/p90 delay, carrier + region cuts, late list), api/routes/logistics.py, tests/test_api_logistics.py. Validation: cuts consistent (late total matches), hotspot identification green.
 
-- [ ] 14.10 Forecasting module (model + WAPE labeled)
+- [x] 14.10 Forecasting module (model + WAPE labeled)
+
+  Completed: 2026-09-14. Files: api/services/forecasts.py (history + best-baseline projection 1-3m with model/wape/note), api/routes/forecasts.py, tests/test_api_forecasts.py. Validation: labels present, horizon respected, filters work, empty-set shape stable.
+
 - [ ] 14.11 Risk center (requires alerts table)
 - [ ] 14.12 Recommendations (explainable only)
 - [ ] 14.13 Data sources (+ guarded upload)

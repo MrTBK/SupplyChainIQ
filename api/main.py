@@ -11,6 +11,7 @@ from .auth import seed_admin
 from .config import SECRET_KEY
 from .foundation import http_exception_handler, unhandled_handler
 from .routes.auth import router as auth_router
+from .routes.forecasts import router as forecasts_router
 from .routes.inventory import router as inventory_router
 from .routes.logistics import router as logistics_router
 from .routes.overview import router as overview_router
@@ -31,6 +32,7 @@ def create_app() -> FastAPI:
         return {"status": "ok", "version": "0.1.0"}
 
     app.include_router(auth_router)
+    app.include_router(forecasts_router)
     app.include_router(inventory_router)
     app.include_router(logistics_router)
     app.include_router(overview_router)
