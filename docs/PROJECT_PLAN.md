@@ -1166,7 +1166,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: api/services/risks.py (live evaluation: stockout/coverage, supplier OTIF, carrier OTD, demand 3-sigma), api/routes/risks.py, tests/test_api_risks.py. Validation: full 7-key explanation per risk, stockout forced case detected, severity filter works. Persistence/ack deferred to 14.16.
 
-- [ ] 14.12 Recommendations (explainable only)
+- [x] 14.12 Recommendations (explainable only)
+
+  Completed: 2026-09-14. Files: api/services/recommendations.py (reorder with stock/forecast/safety/lead/risk/qty, transfer surplus→deficit, preferred supplier with risk-adjusted cost basis), api/routes/recommendations.py, tests/test_api_recommendations.py. Validation: zero-stock fixture yields reorder with all 8 explanation keys; supplier pick cites OTIF basis.
+
 - [ ] 14.13 Data sources (+ guarded upload)
 - [ ] 14.14 ETL monitoring (+ guarded trigger)
 - [ ] 14.15 Data quality monitoring
