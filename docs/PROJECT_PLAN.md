@@ -1154,7 +1154,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: api/services/suppliers.py (spend/OTIF/score/p50/p90 ranking + monthly trend detail), api/routes/suppliers.py, tests/test_api_suppliers.py. Validation: ranking/detail/404 green; fixed empty-filter SQL via condition list.
 
-- [ ] 14.9 Logistics module
+- [x] 14.9 Logistics module
+
+  Completed: 2026-09-14. Files: api/services/logistics.py (OTD, avg/p90 delay, carrier + region cuts, late list), api/routes/logistics.py, tests/test_api_logistics.py. Validation: cuts consistent (late total matches), hotspot identification green.
+
 - [ ] 14.10 Forecasting module (model + WAPE labeled)
 - [ ] 14.11 Risk center (requires alerts table)
 - [ ] 14.12 Recommendations (explainable only)
