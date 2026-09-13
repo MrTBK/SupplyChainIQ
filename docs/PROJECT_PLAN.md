@@ -1142,7 +1142,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: api/foundation.py (envelope, paging caps, allowlisted ORDER BY, LIKE escaping), api/main.py (both HTTPException types handled), tests/test_api_foundation.py. Validation: 4 tests green (envelope hides internals, limit capped 500, injection sort rejected, warehouse write raises OperationalError, app 404 enveloped). Full suite 31 passed.
 
-- [ ] 14.6 Executive overview module
+- [x] 14.6 Executive overview module
+
+  Completed: 2026-09-14. Files: api/services/overview.py, api/routes/overview.py (GET /api/kpis/overview, ops:read), tests/api_fixtures.py, tests/test_api_overview.py. Validation: values match gold logic (sales_lines 1, quarantine >= 2 on fixture), 401 pre-login.
+
 - [ ] 14.7 Inventory module (+ product drill)
 - [ ] 14.8 Supplier module
 - [ ] 14.9 Logistics module
