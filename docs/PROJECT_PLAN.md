@@ -1349,9 +1349,18 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: frontend/src/api.js (ApiError with status from envelope, CSRF auto-header kept), hooks.jsx (useApi status, ErrorPanel 403 vs generic, NotFound, ErrorBoundary), Login.jsx (loading/disabled/visibility/autocomplete), pages.jsx (ErrorPanel everywhere), main.jsx (ErrorBoundary + * route). Validation: 5 static UX-security tests green; build green; browser login with new UI signs in to overview.
 
-- [ ] H10 secrets/config review
-- [ ] H11 dependency review
-- [ ] H12 deployment guards (body-size, dev-vs-prod)
+- [x] H10 secrets/config review
+
+  Completed: 2026-09-14. Files: config/.env.example (+11 web/security vars, placeholders only), api/config.py (trusted_hosts, using_dev_secrets), api/main.py (startup warning names settings, never values), tests/test_security_config.py. Validation: warning fires on defaults and stays silent on custom env; `git ls-files` proves zero secret files tracked; .env/app.db/warehouse.db ignored.
+
+- [x] H11 dependency review
+
+  Completed: 2026-09-14. Backend: 24 pinned pkgs (fastapi/uvicorn/starlette/pydantic current, stdlib-first, no action). Frontend `npm audit`: 4 vulns (esbuild dev-server forgery moderate; vite .map path-traversal high; 2× react-router moderate) — all dev-server/SSR-only, unreachable in shipped static dist; app uses static internal links only and no SSR. Decision: no blind breaking upgrade to vite 8 / react-router 7; re-evaluate on stable adoption or if dev server is ever exposed. No dependency changes made.
+
+- [x] H12 deployment guards (body-size, dev-vs-prod)
+
+  Completed: 2026-09-14. Files: api/guards.py (1MB JSON cap, upload path exempt), api/main.py (TrustedHostMiddleware iff SCI_TRUSTED_HOSTS set), tests/test_security_config.py. Validation: 4 config tests green (warning, no-tracked-secrets, 413 + exempt upload, hosts off/on).
+
 - [ ] H13 docs/security.md + ADRs
 - [ ] H14 final read-only security audit
 
@@ -1435,6 +1444,11 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 ### 2026-09-14 (H9 frontend fixes)
 - Envelope bug fixed (was showing raw API codes), 403/404 states, hardened login, error boundary, no console leakage.
 - Evidence: 5 UX-security tests green; build green; browser sign-in verified.
+
+### 2026-09-14 (H10/H11/H12 secrets, deps, deploy guards)
+- .env.example extended (placeholders only); startup warns on dev-secret defaults; TrustedHost opt-in; 1MB JSON body cap.
+- npm audit: 4 vulns, all dev-only/unreachable — accepted with rationale, no blind majors.
+- Evidence: 4 config tests green.
 
 ## 6. ARCHITECTURE DECISIONS
 

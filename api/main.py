@@ -2,14 +2,19 @@
 
 from __future__ import annotations
 
+import logging
+
 from fastapi import FastAPI, HTTPException
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from .alerts import init_alerts_schema
 from .auth import seed_admin
+from .config import trusted_hosts, using_dev_secrets
 from .cors import apply_cors
 from .db import app_db, warehouse_ro
 from .foundation import http_exception_handler, unhandled_handler
+from .guards import BodyLimitMiddleware
 from .headers import SecurityHeadersMiddleware
 from .observability import REQUEST_ID_HEADER, ObservabilityMiddleware
 from .routes.admin import router as admin_router
@@ -34,9 +39,18 @@ def create_app() -> FastAPI:
     init_sessions_schema()
     from .users import init_admin_schema
     init_admin_schema()
+    weak = using_dev_secrets()
+    if weak:
+        logging.getLogger("supplychainiq").warning(
+            "insecure dev defaults in use for: %s (override via environment in production)",
+            ", ".join(weak))
     app = FastAPI(title="SupplyChainIQ API", version="0.1.0")
     app.add_middleware(ObservabilityMiddleware)
     app.add_middleware(SecurityHeadersMiddleware)
+    app.add_middleware(BodyLimitMiddleware)
+    hosts = trusted_hosts()
+    if hosts:
+        app.add_middleware(TrustedHostMiddleware, allowed_hosts=hosts)
     apply_cors(app)
     app.add_exception_handler(HTTPException, http_exception_handler)
     app.add_exception_handler(StarletteHTTPException, http_exception_handler)
