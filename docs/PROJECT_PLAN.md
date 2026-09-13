@@ -1174,7 +1174,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: api/services/sources.py (14 sources, required-column contracts, 10MB cap, stage-only), api/routes/sources.py, tests/test_api_sources.py, requirements.txt (+python-multipart, uvicorn version corrected to 0.52.4). Validation: status reflects runs, valid upload staged, bad schema 422, analyst upload 403.
 
-- [ ] 14.14 ETL monitoring (+ guarded trigger)
+- [x] 14.14 ETL monitoring (+ guarded trigger)
+
+  Completed: 2026-09-14. Files: api/services/etl_runs.py (history + allowlisted trigger), api/routes/etl_runs.py, tests/test_api_etl.py. Validation: 3 tests green (history shape/counts, traversal + unknown-dir 422, analyst 403, success path loads + history grows). Fixed stale module-level DB path (lazy config) found by failing test.
+
 - [ ] 14.15 Data quality monitoring
 - [ ] 14.16 Alerts center
 - [ ] 14.17 Administration (RBAC minimum + audit log)
