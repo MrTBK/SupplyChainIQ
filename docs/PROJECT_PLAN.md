@@ -1186,7 +1186,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: api/alerts.py (app.db store, day-dedupe, ack/resolve), api/routes/alerts.py, tests/test_api_alerts.py. Validation: 2 tests green (dedupe second-evaluate stores 0, ack flips counts, 404/422 paths, analyst evaluate 403).
 
-- [ ] 14.17 Administration (RBAC minimum + audit log)
+- [x] 14.17 Administration (RBAC minimum + audit log)
+
+  Completed: 2026-09-14. Files: api/users.py (CRUD guards + audit_log), api/routes/admin.py (/users /roles /audit, admin-only), tests/test_api_admin.py. Validation: 2 tests green (409/422/400-self/400-last-admin/404 paths, non-admin 403s, audit captures create/update/delete).
+
 - [ ] 14.18 Frontend integration testing
 - [ ] 14.19 Security testing
 - [ ] 14.20 End-to-end testing
