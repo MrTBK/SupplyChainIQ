@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 from ..auth import authenticate
 from ..config import COOKIE_SECURE, SESSION_COOKIE
+from ..rate_limit import clear_login, login_allowed, record_login_failure
 from ..rbac import current_user
 from ..sessions import ABSOLUTE_HOURS, create_session, destroy_session
 
@@ -26,9 +27,16 @@ def _set_session_cookie(response: Response, sid: str) -> None:
 
 @router.post("/login")
 def login(body: LoginIn, request: Request, response: Response) -> dict:
+    key = f"{request.client.host if request.client else 'unknown'}:{body.username.strip().lower()}"
+    allowed, retry_after = login_allowed(key)
+    if not allowed:
+        raise HTTPException(status_code=429, detail="Too many login attempts, try again later",
+                            headers={"Retry-After": str(retry_after)})
     user = authenticate(body.username.strip(), body.password)
     if not user:
+        record_login_failure(key)
         raise HTTPException(status_code=401, detail="Invalid username or password")
+    clear_login(key)
     _set_session_cookie(response, create_session(user["id"]))
     return {"id": user["id"], "username": user["username"], "role": user["role"]}
 

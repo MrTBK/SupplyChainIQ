@@ -11,7 +11,8 @@ DEFAULT_LIMIT = 50
 
 async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
     return JSONResponse(status_code=exc.status_code,
-                        content={"error": {"code": exc.status_code, "message": exc.detail}})
+                        content={"error": {"code": exc.status_code, "message": exc.detail}},
+                        headers=dict(exc.headers or {}))
 
 
 async def unhandled_handler(request: Request, exc: Exception) -> JSONResponse:

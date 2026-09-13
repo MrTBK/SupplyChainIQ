@@ -1317,7 +1317,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: api/sessions.py (random-ID store, idle 30m + absolute 8h env-tunable, lazy expiry cleanup), api/auth.py (disabled column + migration, dummy-hash timing fix), api/rbac.py (per-request DB revalidation), api/routes/auth.py (cookie set/delete, no SessionMiddleware), api/routes/admin.py (actor via dependency, disabled flag, session revocation on role/password/delete), api/users.py, tests/test_security_sessions.py, tests/test_api_rbac.py (fixture updated). Validation: 4 new tests green (logout invalidation + replay rejected, rotation/fixation-safe IDs, disable/delete revocation, expiry); full suite 64 passed. Fixed SQLite lock by revoking after commit.
 
-- [ ] H2 login rate limiting (429)
+- [x] H2 login rate limiting (429)
+
+  Completed: 2026-09-14. Files: api/rate_limit.py (sliding window per IP+account, env-tunable, in-memory with Redis-upgrade note), api/routes/auth.py (429 + Retry-After, success clears), api/foundation.py (envelope preserves exc headers), tests/test_security_ratelimit.py. Validation: 2 tests green (block at 6th failure, correct-password refused while blocked, success resets streak); suite 66 passed.
+
 - [ ] H3 CSRF protection for cookie mutations
 - [ ] H4 explicit CORS policy
 - [ ] H5 security headers middleware
@@ -1383,6 +1386,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 ### 2026-09-14 (H1 server-side sessions)
 - Random-ID session store in app.db; logout/deleted/disabled/expired all revoke server-side; rotation per login; idle+absolute expiry env-tunable; dummy-hash timing fix.
 - Evidence: 4 regression tests green; full suite 64 passed.
+
+### 2026-09-14 (H2 login rate limiting)
+- Sliding window 5/300s per IP+account; 429 envelope + Retry-After; success clears bucket.
+- Evidence: 2 tests green; suite 66 passed.
 
 ## 6. ARCHITECTURE DECISIONS
 
