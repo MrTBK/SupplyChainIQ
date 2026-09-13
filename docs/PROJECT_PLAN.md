@@ -17,22 +17,23 @@
 ## 2. Current Status
 
 ```text
-Current Phase: Phase 0 — Discovery & Skills
-Current Milestone: Repo scaffold complete (Task 0.1), Phase 1 gated
-Overall Progress: 5%
+Current Phase: Phase 1 — Requirements (Phase 0 COMPLETE)
+Current Milestone: ADR-001 to 005 locked, requirements start
+Overall Progress: 7%
 
 Completed:
 ✓ Project plan skeleton in chat
 ✓ docs/PROJECT_PLAN.md created
 ✓ Git init on main + repo skeleton + config/.env.example
 ✓ tests/test_smoke.py green (3 passed)
+✓ Phase 0 — Discovery & Skills COMPLETE (ADR lock)
 
 In Progress:
-→ Phase 0 approval + ADR lock
+→ Phase 1 Task 1.1: personas + per-role decisions
 
 Next:
-□ ADR-001 to ADR-005 lock
-□ Phase 1 — Requirements start (docs/business_requirements.md)
+□ docs/business_requirements.md draft
+□ Phase 2 domain modeling (gated on Phase 1)
 
 Blockers:
 None
@@ -41,7 +42,7 @@ Last Updated:
 2026-09-13
 
 Last Completed Task:
-Task 0.1: git init + skeleton + smoke tests green
+Phase 0 ADR lock — ADR-001 to 005 APPROVED
 
 Next Concrete Task:
 Phase 1 Task 1.1: define personas + per-role decisions
@@ -49,15 +50,15 @@ Phase 1 Task 1.1: define personas + per-role decisions
 
 | Metric | Value |
 |---|---|
-| Current phase | Phase 0 — Discovery & Skills |
-| Current milestone | Scaffold complete, ADR lock pending |
-| Overall progress | 5% (plan + scaffold, zero pipeline built) |
-| Completed phases | None marked COMPLETE yet |
-| Active phase | Phase 0 |
-| Next phase | Phase 1 — Requirements (gated) |
+| Current phase | Phase 1 — Requirements (Phase 0 COMPLETE) |
+| Current milestone | ADR lock done, requirements start |
+| Overall progress | 7% (Phase 0 complete, pipeline not started) |
+| Completed phases | Phase 0 — Discovery & Skills COMPLETE 2026-09-13 |
+| Active phase | Phase 1 |
+| Next phase | Phase 2 — Domain Modeling (gated) |
 | Current blocker | None |
 | Last updated | 2026-09-13 |
-| Last completed task | Task 0.1 scaffold + 3 smoke tests green |
+| Last completed task | Phase 0 ADR lock — 5 ADRs APPROVED |
 | Next concrete task | See Section 14 Next Action |
 
 ## 3. ROADMAP
@@ -991,7 +992,22 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 - [x] Create docs/PROJECT_PLAN.md v1
 - [x] User approval of plan file (approved via do it 2026-09-13)
 - [x] Git init + skeleton (README, .gitignore, config/.env.example, requirements.txt, tests/test_smoke.py)
-- [ ] ADR-001 stack draft lock
+- [x] ADR-001 to ADR-005 lock
+
+  Completed: 2026-09-13
+
+  Implemented:
+  - Approved ADR-001 Postgres 16, ADR-002 Python+SQL, ADR-003 Power BI, ADR-004 baselines-first, ADR-005 no frontend v1
+  - Synced docs/decisions.md and plan section 6 to APPROVED
+
+  Files:
+  - docs/decisions.md
+  - docs/PROJECT_PLAN.md (section 6)
+
+  Validation:
+  - .venv/bin/pytest -q = 3 passed
+  - grep DRAFT in decisions + plan = zero matches
+  - git grep config/.env = not committed
 
 ### Phase 1 — Requirements
 - [ ] Define personas + per-role decisions
@@ -1139,9 +1155,14 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 - Evidence: .venv/bin/pytest -q = 3 passed. No secrets committed.
 - Progress 5%. Next: ADR lock then Phase 1 requirements.
 
+### 2026-09-13 (Phase 0 ADR lock)
+- Approved ADR-001 to ADR-005. Synced docs/decisions.md + plan section 6.
+- Validation: pytest 3 passed, zero DRAFT matches, config/.env not committed.
+- Phase 0 marked COMPLETE. Progress 7%. Next: Phase 1 Task 1.1.
+
 ## 6. ARCHITECTURE DECISIONS
 
-### ADR-001 — PostgreSQL as Warehouse (DRAFT)
+### ADR-001 — PostgreSQL as Warehouse (APPROVED)
 * Decision: PostgreSQL 16 canonical warehouse.
 * Context: Need free, Docker-ready dimensional warehouse with window functions, Power BI connector.
 * Alternatives considered: SQL Server, DuckDB (local dev only).
@@ -1149,9 +1170,9 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 * Reason: Zero license cost, mature, testable, compose-ready.
 * Consequences: Team uses Postgres locally. SQL Server port needs small dialect check later.
 * Date: 2026-09-13
-* Status: DRAFT awaiting approval
+* Status: APPROVED 2026-09-13 (Task Phase 0 ADR lock)
 
-### ADR-002 — Python + SQL for ETL, no SSIS in v1 (DRAFT)
+### ADR-002 — Python + SQL for ETL, no SSIS in v1 (APPROVED)
 * Decision: Python ingestion + SQL transforms, idempotent watermark loads.
 * Context: Cross-platform reproducibility, git diff, pytest.
 * Alternatives: SSIS, dbt.
@@ -1159,32 +1180,32 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 * Reason: No Windows lock, no license, easy quarantine + logging.
 * Consequences: Must implement watermark/idempotency manually with tests.
 * Date: 2026-09-13
-* Status: DRAFT
+* Status: APPROVED 2026-09-13
 
-### ADR-003 — Power BI for BI layer (DRAFT)
+### ADR-003 — Power BI for BI layer (APPROVED)
 * Decision: Power BI Desktop semantic model, star import, DAX measures only.
 * Context: Project requirement.
 * Alternatives: None for semantic model (required).
 * Reason: Requirement + mature modeling + incremental refresh path.
 * Consequences: Model size discipline, date table mandatory.
 * Date: 2026-09-13
-* Status: DRAFT
+* Status: APPROVED 2026-09-13
 
-### ADR-004 — Baselines before complex ML (DRAFT)
+### ADR-004 — Baselines before complex ML (APPROVED)
 * Decision: Naive + MA + SES must run before ARIMA/XGB/Prophet. Simplest within 2% WAPE wins.
 * Context: Avoid overfit and complexity without lift.
 * Reason: Time-series best practice, leakage control, explainability.
 * Consequences: Extra baseline code, but prevents black-box adoption.
 * Date: 2026-09-13
-* Status: DRAFT
+* Status: APPROVED 2026-09-13
 
-### ADR-005 — No full frontend in v1 (DRAFT)
+### ADR-005 — No full frontend in v1 (APPROVED)
 * Decision: No CRUD app. FastAPI/monitoring UI only if proven useful, recorded in Phase 14.
 * Context: Core value is BI/data platform.
 * Reason: Prevent scope creep, protect data focus.
 * Consequences: BI remains center. Monitoring via logs + Power BI + optional minimal API.
 * Date: 2026-09-13
-* Status: DRAFT
+* Status: APPROVED 2026-09-13
 
 Update this log on every significant change. Never silently change architecture.
 
@@ -1192,7 +1213,7 @@ Update this log on every significant change. Never silently change architecture.
 
 | Phase | Status | Progress |
 |---|---|---:|
-| Phase 0 — Discovery & Skills | In Progress | 60% |
+| Phase 0 — Discovery & Skills | Complete | 100% |
 | Phase 1 — Requirements | Not Started | 0% |
 | Phase 2 — Domain Modeling | Not Started | 0% |
 | Phase 3 — Data Strategy | Not Started | 0% |
@@ -1214,7 +1235,7 @@ Update this log on every significant change. Never silently change architecture.
 | Phase 19 — Documentation | Not Started | 0% |
 | Phase 20 — Final Validation & Demo | Not Started | 0% |
 
-Overall: 5%. Based on completed tasks only, not estimation.
+Overall: 7%. Based on completed tasks only, not estimation.
 
 ## 8. TEST STATUS
 
@@ -1315,19 +1336,19 @@ Process: for every blocker record problem, impact, cause, possible solutions, cu
 
 The next concrete task is:
 
-> Phase 1 Task 1.1: define personas + per-role decisions and start docs/business_requirements.md. Then lock ADR-001 to ADR-005 to close Phase 0.
+> Phase 1 Task 1.1: define personas + per-role decisions and start docs/business_requirements.md.
 
 Reason:
 
-> Scaffold is green and committed. Requirements must freeze before domain modeling or generator work to prevent rework.
+> Phase 0 is COMPLETE with locked stack. Requirements must freeze before domain modeling to prevent rework.
 
 Prerequisites:
 
-> Phase 0 scaffold done. No pipeline work yet.
+> None beyond Phase 0. Work only on personas + decisions table, not full requirements doc yet.
 
 Expected result:
 
-> docs/business_requirements.md draft with persona decision table + question to KPI trace started, Phase 0 marked COMPLETE after ADR lock.
+> Persona decision table committed in docs/business_requirements.md stub, tracker updated, tests still green.
 ```
 
 ---

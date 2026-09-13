@@ -2,7 +2,7 @@
 
 Log for every significant decision. Never silently change architecture.
 
-## ADR-001 — PostgreSQL as Warehouse (DRAFT 2026-09-13)
+## ADR-001 — PostgreSQL as Warehouse (APPROVED 2026-09-13)
 
 Context: Need free, Docker-ready dimensional warehouse with window functions and Power BI connector.
 
@@ -14,7 +14,7 @@ Reason: Zero license, mature, testable, compose-ready.
 
 Consequences: Team runs Postgres locally. Small dialect check needed if enterprise mandates SQL Server.
 
-## ADR-002 — Python + SQL for ETL, no SSIS in v1 (DRAFT 2026-09-13)
+## ADR-002 — Python + SQL for ETL, no SSIS in v1 (APPROVED 2026-09-13)
 
 Context: Cross-platform reproducibility, git diff, pytest.
 
@@ -26,7 +26,7 @@ Reason: No Windows lock, no license, explicit quarantine + logging.
 
 Consequences: Implement watermark/idempotency manually with tests.
 
-## ADR-003 — Power BI for BI layer (DRAFT 2026-09-13)
+## ADR-003 — Power BI for BI layer (APPROVED 2026-09-13)
 
 Context: Project requirement.
 
@@ -36,13 +36,13 @@ Reason: Requirement + modeling maturity + incremental refresh path.
 
 Consequences: Model size discipline required.
 
-## ADR-004 — Baselines before complex ML (DRAFT 2026-09-13)
+## ADR-004 — Baselines before complex ML (APPROVED 2026-09-13)
 
 Decision: Naive + MA + SES must run before ARIMA/XGB/Prophet. Simplest within 2% WAPE wins.
 
 Reason: Best practice, leakage control, explainability.
 
-## ADR-005 — No full frontend in v1 (DRAFT 2026-09-13)
+## ADR-005 — No full frontend in v1 (APPROVED 2026-09-13)
 
 Decision: No CRUD app. FastAPI/monitoring UI only if proven useful (Phase 14 gate).
 
