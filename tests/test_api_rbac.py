@@ -24,9 +24,9 @@ def app(tmp_path, monkeypatch):
     con.commit()
     con.close()
     from api.routes.auth import router as auth_router
+    from api.sessions import init_sessions_schema
+    init_sessions_schema()
     app = FastAPI()
-    from starlette.middleware.sessions import SessionMiddleware
-    app.add_middleware(SessionMiddleware, secret_key="test-secret")
     app.include_router(auth_router)
 
     @app.get("/probe-ops", dependencies=[Depends(require_perm("ops:read"))])

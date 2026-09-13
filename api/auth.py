@@ -37,6 +37,7 @@ def init_auth_schema() -> None:
         username TEXT NOT NULL UNIQUE,
         password_hash TEXT NOT NULL,
         role TEXT NOT NULL,
+        disabled INTEGER NOT NULL DEFAULT 0,
         created_at TEXT NOT NULL DEFAULT (datetime('now')))""")
     con.commit()
     con.close()
@@ -61,9 +62,13 @@ def seed_admin() -> str:
 
 def authenticate(username: str, password: str) -> dict | None:
     con = app_db()
-    row = con.execute("SELECT id, username, password_hash, role FROM users WHERE username=?",
+    row = con.execute("SELECT id, username, password_hash, role, disabled FROM users WHERE username=?",
                       (username,)).fetchone()
     con.close()
-    if row and verify_password(password, row["password_hash"]):
-        return {"id": row["id"], "username": row["username"], "role": row["role"]}
-    return None
+    if row is None:
+        # timing-neutral: unknown accounts cost the same PBKDF2 work (no oracle)
+        verify_password(password, hash_password("dummy"))
+        return None
+    if row["disabled"] or not verify_password(password, row["password_hash"]):
+        return None
+    return {"id": row["id"], "username": row["username"], "role": row["role"]}

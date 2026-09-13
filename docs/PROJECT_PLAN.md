@@ -1313,7 +1313,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 - [x] Final gate + tag (this commit; tag after push if remote added)
 
 ### Phase 21 — Production Hardening
-- [ ] H1 server-side sessions + revocation + disabled users
+- [x] H1 server-side sessions + revocation + disabled users
+
+  Completed: 2026-09-14. Files: api/sessions.py (random-ID store, idle 30m + absolute 8h env-tunable, lazy expiry cleanup), api/auth.py (disabled column + migration, dummy-hash timing fix), api/rbac.py (per-request DB revalidation), api/routes/auth.py (cookie set/delete, no SessionMiddleware), api/routes/admin.py (actor via dependency, disabled flag, session revocation on role/password/delete), api/users.py, tests/test_security_sessions.py, tests/test_api_rbac.py (fixture updated). Validation: 4 new tests green (logout invalidation + replay rejected, rotation/fixation-safe IDs, disable/delete revocation, expiry); full suite 64 passed. Fixed SQLite lock by revoking after commit.
+
 - [ ] H2 login rate limiting (429)
 - [ ] H3 CSRF protection for cookie mutations
 - [ ] H4 explicit CORS policy
@@ -1376,6 +1379,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 ### 2026-09-14 (Phase 21 hardening kickoff)
 - Read-only inspection of api/, frontend/, tests, config, deployment. Gap assessment: sessions client-side (top P0), no rate limiting, no CSRF/CORS/headers, upload gaps (MIME/traversal tests/caps), audit covers user-CRUD only, no request IDs/readiness, api.js envelope bug, no 403/404 states, dev-secret fallback, deps unreviewed.
 - Added Phase 21 roadmap section + H1-H14 tracker. No code changed in this step.
+
+### 2026-09-14 (H1 server-side sessions)
+- Random-ID session store in app.db; logout/deleted/disabled/expired all revoke server-side; rotation per login; idle+absolute expiry env-tunable; dummy-hash timing fix.
+- Evidence: 4 regression tests green; full suite 64 passed.
 
 ## 6. ARCHITECTURE DECISIONS
 
@@ -1463,7 +1470,7 @@ Update this log on every significant change. Never silently change architecture.
 | Phase 18 — Deployment | Complete | 100% |
 | Phase 19 — Documentation | Complete | 100% |
 | Phase 20 — Final Validation & Demo | Complete | 100% |
-| Phase 21 — Production Hardening | Not started | 0% |
+| Phase 21 — Production Hardening | In progress (H1 done) | 7% |
 
 Overall: 93%. Based on completed tasks only, not estimation.
 
@@ -1559,7 +1566,7 @@ Process: for every blocker record problem, impact, cause, possible solutions, cu
 
 The next concrete task is:
 
-> H1 server-side session store (sessions table, login rotation, logout invalidation, idle+absolute expiry, disabled-user revocation).
+> H2 login rate limiting (429 per IP+account, configurable, regression-tested).
 
 Reason:
 

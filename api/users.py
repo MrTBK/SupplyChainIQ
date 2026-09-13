@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from .auth import ROLES, hash_password
 from .db import app_db
 from .rbac import PERMISSIONS
+from .sessions import destroy_user_sessions
 
 
 def init_admin_schema() -> None:
@@ -28,7 +29,7 @@ def audit(actor: str, action: str, detail: str = "") -> None:
 
 def list_users() -> list[dict]:
     con = app_db()
-    rows = con.execute("SELECT id, username, role, created_at FROM users ORDER BY username").fetchall()
+    rows = con.execute("SELECT id, username, role, disabled, created_at FROM users ORDER BY username").fetchall()
     con.close()
     return [dict(r) for r in rows]
 
@@ -52,7 +53,7 @@ def create_user(username: str, password: str, role: str) -> dict:
     return {"id": uid, "username": username, "role": role}
 
 
-def update_user(uid: int, role: str = "", password: str = "") -> dict | None:
+def update_user(uid: int, role: str = "", password: str = "", disabled: bool | None = None) -> dict | None:
     if role and role not in ROLES:
         raise ValueError(f"role must be one of {sorted(ROLES)}")
     con = app_db()
@@ -60,16 +61,24 @@ def update_user(uid: int, role: str = "", password: str = "") -> dict | None:
     if not row:
         con.close()
         return None
+    revoke = False
     if role:
         con.execute("UPDATE users SET role=? WHERE id=?", (role, uid))
+        revoke = True  # role change revokes existing sessions
+    if disabled is not None:
+        con.execute("UPDATE users SET disabled=? WHERE id=?", (1 if disabled else 0, uid))
+        revoke = revoke or bool(disabled)
     if password:
         if len(password) < 8:
             con.close()
             raise ValueError("password min 8 chars")
         con.execute("UPDATE users SET password_hash=? WHERE id=?", (hash_password(password), uid))
+        revoke = True  # security change revokes existing sessions
     con.commit()
-    row = con.execute("SELECT id, username, role, created_at FROM users WHERE id=?", (uid,)).fetchone()
+    row = con.execute("SELECT id, username, role, disabled, created_at FROM users WHERE id=?", (uid,)).fetchone()
     con.close()
+    if revoke:
+        destroy_user_sessions(uid)  # separate connection after commit (avoids lock)
     return dict(row)
 
 
@@ -90,6 +99,7 @@ def delete_user(uid: int, actor_id: int) -> str:
     con.execute("DELETE FROM users WHERE id=?", (uid,))
     con.commit()
     con.close()
+    destroy_user_sessions(uid)
     return "ok"
 
 

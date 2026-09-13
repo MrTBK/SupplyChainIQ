@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from .. import users as store
-from ..rbac import current_role, require_perm
+from ..rbac import current_role, current_user, require_perm
 
 router = APIRouter(prefix="/api", tags=["admin"])
 _guard = Depends(require_perm("admin:users"))
@@ -25,44 +25,45 @@ class UserIn(BaseModel):
 
 
 @router.post("/users", dependencies=[_guard])
-def post_user(body: UserIn, request: Request) -> dict:
+def post_user(body: UserIn, actor: dict = Depends(current_user)) -> dict:
     try:
         user = store.create_user(body.username, body.password, body.role)
     except ValueError as e:
         msg = str(e)
         raise HTTPException(status_code=409 if "already exists" in msg else 422, detail=msg)
-    store.audit(request.session.get("uid") and str(request.session.get("uid")) or "?",
-                "user.create", user["username"])
+    store.audit(str(actor["uid"]), "user.create", user["username"])
     return user
 
 
 class UserPatch(BaseModel):
     role: str = ""
     password: str = ""
+    disabled: bool | None = None
 
 
 @router.patch("/users/{uid}", dependencies=[Depends(require_perm("admin:users"))])
-def patch_user(uid: int, body: UserPatch, request: Request) -> dict:
+def patch_user(uid: int, body: UserPatch, actor: dict = Depends(current_user)) -> dict:
     try:
-        user = store.update_user(uid, role=body.role, password=body.password)
+        user = store.update_user(uid, role=body.role, password=body.password, disabled=body.disabled)
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    store.audit(str(request.session.get("uid")), "user.update", user["username"])
+    store.audit(str(actor["uid"]), "user.update", user["username"])
     return user
 
 
 @router.delete("/users/{uid}", dependencies=[Depends(require_perm("admin:users"))])
-def delete_user(uid: int, request: Request, role: str = Depends(current_role)) -> dict:
-    result = store.delete_user(uid, request.session.get("uid"))
+def delete_user(uid: int, actor: dict = Depends(current_user),
+                role: str = Depends(current_role)) -> dict:
+    result = store.delete_user(uid, actor["uid"])
     if result == "self":
         raise HTTPException(status_code=400, detail="Cannot delete your own account")
     if result == "missing":
         raise HTTPException(status_code=404, detail="User not found")
     if result == "last-admin":
         raise HTTPException(status_code=400, detail="Cannot delete the last administrator")
-    store.audit(str(request.session.get("uid")), "user.delete", str(uid))
+    store.audit(str(actor["uid"]), "user.delete", str(uid))
     return {"status": "deleted", "id": uid}
 
 
