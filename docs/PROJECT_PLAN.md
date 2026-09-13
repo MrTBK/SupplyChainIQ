@@ -1422,7 +1422,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: frontend/src/icons.jsx (18 geometric stroke icons), shell.css (navy topbar, grouped sidebar, collapse rail, mobile drawer, user menu), Shell.jsx (groups, active states, adminOnly filter, persisted collapse, breadcrumb, live alerts bell), main.jsx (rewired), api/routes/auth.py (/me now returns username — reload crash fix), tests/test_api_auth.py (username assertion). Validation: build green; browser screenshots (full/grouped/collapsed/analyst-no-Admin); visual QA found + fixed reload-while-logged-in crash (missing username).
 
-- [ ] F3 component library + SVG charts + icons
+- [x] F3 component library + SVG charts + icons
+
+  Completed: 2026-09-14. Files: frontend/src/components.{css,jsx} (Button/Input/Select/Badge/Card/KpiCard/PageHeader/EmptyState/Skeleton/DataTable+Pagination/Alert/Modal/Toasts), charts.jsx (Line+projection/Bars/Sparkline, titled/described), tokens.js (JS palette mirror), hooks.jsx ErrorPanel detokenized, tests/test_frontend_library.py. Validation: 5 lib tests green (exports, chart a11y, token-only rule, mirror parity, zero new deps); build green.
+
 - [ ] F4 branded login
 - [ ] F5 overview/inventory/suppliers/logistics/forecasts redesign
 - [ ] F6 risks/recs/sources/ETL/quality/admin redesign

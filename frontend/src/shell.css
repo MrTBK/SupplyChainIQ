@@ -124,7 +124,7 @@
   height: 28px;
   border-radius: 50%;
   background: var(--secondary);
-  color: #fff;
+  color: var(--on-primary);
   font-size: var(--text-caption);
   font-weight: 700;
 }

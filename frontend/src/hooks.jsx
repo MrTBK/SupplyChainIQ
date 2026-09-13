@@ -21,9 +21,9 @@ export function useApi(path, params) {
 export function ErrorPanel({ error, status }) {
   if (status === 403) {
     return (
-      <div role="alert" style={{ border: '1px solid #b00', padding: '0.75rem', borderRadius: 4 }}>
+      <div className="sci-alert sci-alert-danger" role="alert">
         <b>403 — Not permitted.</b>
-        <p>Your role cannot access this. Contact an administrator if you need it.</p>
+        <p style={{ marginBottom: 0 }}>Your role cannot access this. Contact an administrator if you need it.</p>
       </div>
     )
   }
