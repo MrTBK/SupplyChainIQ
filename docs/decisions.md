@@ -59,3 +59,17 @@ Reason: Warehouse + BI must prove stable first. Security design done, code defer
 Decision: No web app in v1. Monitoring via logs + DQ views + Power BI. FastAPI reconsidered only on proven ops need.
 
 Reason: Protect data-platform focus per ADR-005.
+
+## ADR-008 — Build operational web layer: FastAPI + React/Vite, session auth (APPROVED 2026-09-14)
+
+Decision: Build the web application as operational/control layer around the BI platform. Backend FastAPI (typed, TestClient-tested), frontend React + Vite SPA, server-side session cookies, SQLite demo / Postgres canonical. Frontend talks only to the API; API talks to services reusing analytics/, forecasting/, etl/, warehouse marts. Supersedes ADR-005/007 (kept for history).
+
+Alternatives: Flask (rejected — weaker typing/auth ecosystem for 13-module scope); Jinja SSR (rejected by stakeholder frontend choice); JWT bearer (rejected by stakeholder auth choice — sessions fit operational user counts and are revocable).
+
+API route table (business capabilities only): /auth (login/logout/me), /users /roles (admin), /kpis/overview, /inventory /products/:id, /suppliers, /shipments /deliveries, /forecasts, /risks /recommendations /alerts, /data-sources (+upload), /etl-runs (+guarded trigger), /data-quality, /audit.
+
+RBAC matrix: executive (read all ops, no trigger/upload/admin), supply/procurement/inventory/logistics managers (read all ops + trigger ETL + upload sources in own domain), analyst (read all ops, no trigger/upload/admin), administrator (all + users/roles/audit). ETL trigger allowlist: generate-seed + load-batch jobs only; no arbitrary commands. Uploads land as batches and pass the same R01-R08 quarantine.
+
+Reason: User directive 2026-09-14 requires usable operational interface; stack fits existing Python codebase, installed ui-styling skill, and Node 22 availability. Power BI keeps deep analytics; web app owns monitoring/workflows.
+
+Consequences: requirements.txt gains fastapi/uvicorn + hashing lib; new api/, frontend/, alerts table; E2E/security test suites; .pbix remains separate.
