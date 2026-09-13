@@ -25,6 +25,8 @@ data/*.sqlite*
 # Generated demo report outputs (reproduce via scripts/make_report.py)
 reports/demo.html
 reports/demo-screenshot.png
+reports/web-login.png
+reports/web-overview.png
 
 # Frontend
 frontend/node_modules/

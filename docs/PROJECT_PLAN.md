@@ -1190,7 +1190,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: api/users.py (CRUD guards + audit_log), api/routes/admin.py (/users /roles /audit, admin-only), tests/test_api_admin.py. Validation: 2 tests green (409/422/400-self/400-last-admin/404 paths, non-admin 403s, audit captures create/update/delete).
 
-- [ ] 14.18 Frontend integration testing
+- [x] 14.18 Frontend integration testing
+
+  Completed: 2026-09-14. Files: frontend/src/hooks.jsx + Login.jsx + pages.jsx (12 modules wired) + main.jsx (session guard), tests/test_api_workflow.py, scripts/web_e2e.py (same-origin proxy + agent-browser login flow). Validation: workflow test green (login→overview→inventory→product→forecast→recommendation→logout→401); `npm run build` green; browser E2E screenshots show Sign in → Executive overview with live numbers (fixed './hooks.jsx' import found by build).
+
 - [ ] 14.19 Security testing
 - [ ] 14.20 End-to-end testing
 - [ ] 14.21 Performance validation
