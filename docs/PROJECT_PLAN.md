@@ -17,22 +17,21 @@
 ## 2. Current Status
 
 ```text
-Current Phase: Phase 14 — Web Application COMPLETE (all 24 tasks)
-Current Milestone: Web v1 released, suite 60+ green, browser E2E verified
-Overall Progress: 100%
+Current Phase: Phase 21 — Production Hardening (H1 next)
+Current Milestone: Gap assessment done, 14 hardening tasks queued
+Overall Progress: 93%
 
 Completed:
 ✓ Phases 0-20 all COMPLETE incl. Phase 14 web app (14.1-14.24)
 ✓ 60 pytest green + `npm run build` green + 11-route browser walk green
-✓ Demo warehouse + marts verified; run.sh one-command reproducible
+✓ Hardening gap assessment (2026-09-14): 8 P0 + 6 P1 gaps, sessions store is top gap
 
 In Progress:
-→ None. Awaiting acceptance / remote push + tag
+→ Phase 21 task setup (plan section + tracker)
 
 Next:
-□ Push to remote + tag web-v1 (needs remote URL)
-□ Assemble .pbix in Power BI Desktop from marts (click-ops, unchanged)
-□ Optional: Postgres prod run, rate limiting, ARIMA/XGB lift study
+□ H1 server-side sessions + revocation + disabled users
+□ H2 login rate limiting → H3 CSRF → H4 CORS → H5 headers …
 
 Blockers:
 None
@@ -41,23 +40,23 @@ Last Updated:
 2026-09-14
 
 Last Completed Task:
-14.24 web release gate — 19/19 acceptance criteria verified
+Hardening gap assessment (no code changed)
 
 Next Concrete Task:
-Acceptance review (see Section 14 Next Action)
+H1 server-side session store
 ```
 
 | Metric | Value |
 |---|---|
-| Current phase | Phase 14 — Web Application COMPLETE |
-| Current milestone | Web v1 released, suite green, browser E2E verified |
-| Overall progress | 100% (all phases + 24 web tasks with evidence) |
+| Current phase | Phase 21 — Production Hardening |
+| Current milestone | Gap assessment done, H1 next |
+| Overall progress | 93% (hardening queued; all prior work complete) |
 | Completed phases | Phases 0-20 COMPLETE 2026-09-14 |
-| Active phase | None (awaiting acceptance) |
-| Next phase | Hardening backlog (push/tag, Postgres prod, rate limits, lift studies) |
+| Active phase | Phase 21 |
+| Next phase | Acceptance (push/tag) after H14 |
 | Current blocker | None |
 | Last updated | 2026-09-14 |
-| Last completed task | 14.24 web release gate |
+| Last completed task | Hardening gap assessment |
 | Next concrete task | See Section 14 Next Action |
 
 ## 3. ROADMAP
@@ -981,6 +980,49 @@ Demos pass, plan marked 100%, release tagged.
 
 ---
 
+### Phase 21 — Production Hardening
+
+### Objective
+Close the 2026-09-14 gap assessment (8 P0 + 6 P1) with minimal diffs: server-side sessions, rate limits, CSRF, CORS, headers, upload hardening, audit, observability, frontend fixes, secrets/deploy guards, docs, final audit. No rewrites, no JWT, no new frameworks.
+
+### Prerequisites
+Phases 14-15 stable (auth/RBAC/foundation to build on).
+
+### Tasks
+H1 server-side sessions + revocation + disabled users. H2 login rate limiting (429). H3 CSRF for cookie mutations. H4 explicit CORS. H5 security headers. H6 upload hardening (MIME, traversal tests, row/column caps). H7 audit expansion (LOGIN/FAILED/LOGOUT/ETL/upload). H8 observability (request IDs, structured log, readiness). H9 frontend security/UX fixes. H10 secrets/config review. H11 dependency review. H12 deployment guards (body-size, dev-vs-prod). H13 docs/security.md + ADRs. H14 final read-only audit.
+
+### Deliverables
+* Hardened api/ + frontend/ with regression tests per fix
+* docs/security.md covering all 16 required topics
+* Final audit table (area, status, evidence, risk, action)
+
+### Files
+* Modify: `api/auth.py`, `api/main.py`, `api/config.py`, `api/routes/*`, `frontend/src/*`
+* Create: `api/sessions.py`, `api/csrf.py`, `api/rate_limit.py`, `api/headers.py`, `api/observability.py`, `tests/test_security_*.py`
+* Update: `docs/security.md`, `docs/decisions.md`, `config/.env.example`
+
+### Technologies
+FastAPI middleware/dependencies (stdlib + existing deps only unless justified).
+
+### Tests
+* Per-fix regression tests (21/22 categories: auth, authz, CSRF, input, SQLi, uploads, rate-limit, errors).
+* Full suite stays green.
+
+### Acceptance Criteria
+* §28 Definition of Done: sessions server-side + revocable, secure cookies, logout invalidates, hashed passwords, backend RBAC, CSRF, restricted CORS, headers, validated input, safe DB, untrusted uploads, audited ops, externalized secrets, clean prod errors, rate limits, no token storage, regression tests, docs + plan accurate, zero critical blockers.
+
+### Risks
+* Breaking working auth flows. Mitigate: keep API shapes, extend tests first where behavior changes.
+* CSRF/CSP breaking the SPA. Mitigate: verify with browser E2E walk after each.
+
+### Dependencies
+Phase 14.
+
+### Definition of Done
+H1-H14 all [x] with evidence; final audit recorded; plan at 100%.
+
+---
+
 ## 4. TASK TRACKER
 
 Use `- [ ]` not started, `- [x]` completed, `- [~]` in progress, `- [!]` blocked.
@@ -1270,6 +1312,22 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 - [x] Technical demo (scripts/demo_e2e.sh evidence: 13.9k sales seed-7, OTD 0.455)
 - [x] Final gate + tag (this commit; tag after push if remote added)
 
+### Phase 21 — Production Hardening
+- [ ] H1 server-side sessions + revocation + disabled users
+- [ ] H2 login rate limiting (429)
+- [ ] H3 CSRF protection for cookie mutations
+- [ ] H4 explicit CORS policy
+- [ ] H5 security headers middleware
+- [ ] H6 upload hardening (MIME, traversal tests, row/column caps)
+- [ ] H7 audit expansion (LOGIN/FAILED/LOGOUT/ETL/upload events)
+- [ ] H8 observability (request IDs, structured log, readiness probe)
+- [ ] H9 frontend security/UX fixes (envelope parsing, 403/404, login states)
+- [ ] H10 secrets/config review
+- [ ] H11 dependency review
+- [ ] H12 deployment guards (body-size, dev-vs-prod)
+- [ ] H13 docs/security.md + ADRs
+- [ ] H14 final read-only security audit
+
 ## Change Log
 
 ### 2026-09-13
@@ -1313,7 +1371,11 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 - Phase 14 COMPLETE. Overall 100%. Known limits: no rate limiting v1; SQLite demo validated (Postgres per 009_roles.sql untested live); supplier quality is returns-proxy.
 
 ### 2026-09-14 (run.sh --web)
-- Added `./run.sh --web`: builds frontend if needed, ensures demo warehouse, serves API + SPA same-origin at http://localhost:8766 via scripts/serve_web.py (foreground, Ctrl+C stops). Verified live: SPA 200, health 200, login 200, authed KPIs through proxy.
+- Added `./run.sh --web`: builds frontend if needed, ensures demo warehouse, serves API + SPA same-origin at http://localhost:8765 via scripts/serve_web.py (foreground, Ctrl+C stops). Verified live: SPA 200, health 200, login 200, authed KPIs through proxy.
+
+### 2026-09-14 (Phase 21 hardening kickoff)
+- Read-only inspection of api/, frontend/, tests, config, deployment. Gap assessment: sessions client-side (top P0), no rate limiting, no CSRF/CORS/headers, upload gaps (MIME/traversal tests/caps), audit covers user-CRUD only, no request IDs/readiness, api.js envelope bug, no 403/404 states, dev-secret fallback, deps unreviewed.
+- Added Phase 21 roadmap section + H1-H14 tracker. No code changed in this step.
 
 ## 6. ARCHITECTURE DECISIONS
 
@@ -1401,8 +1463,9 @@ Update this log on every significant change. Never silently change architecture.
 | Phase 18 — Deployment | Complete | 100% |
 | Phase 19 — Documentation | Complete | 100% |
 | Phase 20 — Final Validation & Demo | Complete | 100% |
+| Phase 21 — Production Hardening | Not started | 0% |
 
-Overall: 100%. Based on completed tasks only, not estimation.
+Overall: 93%. Based on completed tasks only, not estimation.
 
 ## 8. TEST STATUS
 
@@ -1496,27 +1559,19 @@ Process: for every blocker record problem, impact, cause, possible solutions, cu
 
 The next concrete task is:
 
-> Acceptance review: push to remote + tag web-v1 (needs remote URL), or pick hardening backlog (Postgres prod run, login rate limiting, ARIMA/XGB lift study, .pbix assembly).
+> H1 server-side session store (sessions table, login rotation, logout invalidation, idle+absolute expiry, disabled-user revocation).
 
 Reason:
 
-> Phase 14 is COMPLETE with 19/19 acceptance criteria verified and evidence recorded. Nothing in v1 scope remains.
+> Gap assessment top P0: sessions are client-side signed cookies with no revocation, no idle timeout, no rotation, no disabled state. All later hardening (CSRF, audit, logout tests) builds on this.
 
 Prerequisites:
 
-> None. Remote URL needed only for push/tag.
+> None. Keep /api/auth shapes unchanged.
 
 Expected result:
 
-> Acceptance recorded in Change Log, or new task queued with its own acceptance criteria.
-
-Prerequisites:
-
-> None beyond Phase 0. Work only on personas + decisions table, not full requirements doc yet.
-
-Expected result:
-
-> Persona decision table committed in docs/business_requirements.md stub, tracker updated, tests still green.
+> Login/logout/me behave identically from the client's view; sessions table in app.db; 401 after logout, after expiry, and for disabled/deleted users; regression tests green; full suite green.
 ```
 
 ---
