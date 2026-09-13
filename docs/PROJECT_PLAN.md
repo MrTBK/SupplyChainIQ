@@ -17,19 +17,22 @@
 ## 2. Current Status
 
 ```text
-Current Phase: Phase 14 — Web Application (REOPENED, task 14.2 next)
-Current Milestone: ADR-008 locked, structure next
-Overall Progress: 88%
+Current Phase: Phase 14 — Web Application COMPLETE (all 24 tasks)
+Current Milestone: Web v1 released, suite 60+ green, browser E2E verified
+Overall Progress: 100%
 
 Completed:
-✓ Phases 0-13, 15-20 COMPLETE
-✓ 14.1 architecture decision (ADR-008)
+✓ Phases 0-20 all COMPLETE incl. Phase 14 web app (14.1-14.24)
+✓ 60 pytest green + `npm run build` green + 11-route browser walk green
+✓ Demo warehouse + marts verified; run.sh one-command reproducible
 
 In Progress:
-→ 14.2 project structure
+→ None. Awaiting acceptance / remote push + tag
 
 Next:
-□ 14.3 auth → 14.4 RBAC → 14.5 API foundation → modules
+□ Push to remote + tag web-v1 (needs remote URL)
+□ Assemble .pbix in Power BI Desktop from marts (click-ops, unchanged)
+□ Optional: Postgres prod run, rate limiting, ARIMA/XGB lift study
 
 Blockers:
 None
@@ -38,23 +41,23 @@ Last Updated:
 2026-09-14
 
 Last Completed Task:
-14.1 ADR-008 FastAPI + React/Vite + sessions
+14.24 web release gate — 19/19 acceptance criteria verified
 
 Next Concrete Task:
-14.2 api/ + frontend/ structure
+Acceptance review (see Section 14 Next Action)
 ```
 
 | Metric | Value |
 |---|---|
-| Current phase | Phase 14 — Web Application (reopened) |
-| Current milestone | ADR-008 locked, structure next |
-| Overall progress | 88% (14.1 of 24 web tasks done; all else complete) |
-| Completed phases | Phases 0-13, 15-20 COMPLETE; Phase 14 in progress |
-| Active phase | Phase 14 |
-| Next phase | Release gate 14.24, then v2 hardening |
+| Current phase | Phase 14 — Web Application COMPLETE |
+| Current milestone | Web v1 released, suite green, browser E2E verified |
+| Overall progress | 100% (all phases + 24 web tasks with evidence) |
+| Completed phases | Phases 0-20 COMPLETE 2026-09-14 |
+| Active phase | None (awaiting acceptance) |
+| Next phase | Hardening backlog (push/tag, Postgres prod, rate limits, lift studies) |
 | Current blocker | None |
 | Last updated | 2026-09-14 |
-| Last completed task | 14.1 ADR-008 |
+| Last completed task | 14.24 web release gate |
 | Next concrete task | See Section 14 Next Action |
 
 ## 3. ROADMAP
@@ -1210,8 +1213,13 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: frontend labels/overflow/scope fixes, tests/test_ux.py, rebuilt dist. Validation: 4 static UX tests green (12 headed pages, labelled inputs, scrollable scoped tables, zero decorative CSS); browser screenshots from 14.18/14.20 confirm hierarchy and nav.
 
-- [ ] 14.23 Documentation (API, RBAC, security, deployment)
-- [ ] 14.24 Web application release gate
+- [x] 14.23 Documentation (API, RBAC, security, deployment)
+
+  Completed: 2026-09-14. Files: docs/api.md (30-row route table), docs/rbac.md (matrix + rules), docs/security.md + deployment.md (web sections), README (web quickstart). Full suite 60 passed at commit.
+
+- [x] 14.24 Web application release gate
+
+  Completed: 2026-09-14. All 19 acceptance criteria verified: auth works (14.3), RBAC works (14.4), core API works (14.5), overview/inventory/supplier/logistics work (14.6-14.9), forecasting labeled (14.10), risks visible (14.11), recommendations explainable (14.12), sources/ETL/DQ monitored (14.13-14.15), alerts work with dedupe+ack (14.16), security tests pass (14.19), workflows tested API + browser (14.18/14.20), perf bounded + measured (14.21), UX contract green (14.22), docs updated (14.23), plan updated (this entry), deployment reproducible (run.sh + deployment doc + CI). No UI-render-only claims: every module has backend tests + evidence.
 
 ### Phase 15 — Security
 - [x] Roles SQL
@@ -1299,6 +1307,11 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 - User directive supersedes ADR-005/007 (kept for history). Locked ADR-008: FastAPI + React/Vite + session cookies; API reuses analytics/forecasting/etl/marts; new alerts table required; guarded ETL trigger allowlist.
 - Reopened Phase 14 as Web Application with tasks 14.1-14.24. Progress 88%.
 
+### 2026-09-14 (14.2-14.24 web build, task-by-task)
+- 14.2 structure (api/ + Vite, health + build green) → 14.3 sessions/PBKDF2 → 14.4 RBAC matrix → 14.5 envelope/paging/read-only proof → 14.6 overview → 14.7 inventory+drill → 14.8 suppliers → 14.9 logistics → 14.10 labeled forecasts → 14.11 risk evaluation → 14.12 explainable recommendations → 14.13 sources+upload → 14.14 ETL history+trigger → 14.15 DQ gate → 14.16 alerts dedupe+ack → 14.17 admin/audit → 14.18 wired SPA + workflow + browser login E2E → 14.19 security sweep + secure-cookie flag → 14.20 risk-to-ack loop + 11-route browser walk → 14.21 perf bounds (1.9-27.5ms) → 14.22 UX contract → 14.23 api/rbac/security/deployment docs → 14.24 release gate 19/19.
+- Evidence: 60 pytest green, `npm run build` green, browser screenshots (login, overview). Suite count: 19 (platform) + 41 (web).
+- Phase 14 COMPLETE. Overall 100%. Known limits: no rate limiting v1; SQLite demo validated (Postgres per 009_roles.sql untested live); supplier quality is returns-proxy.
+
 ## 6. ARCHITECTURE DECISIONS
 
 ### ADR-001 — PostgreSQL as Warehouse (APPROVED)
@@ -1378,7 +1391,7 @@ Update this log on every significant change. Never silently change architecture.
 | Phase 11 — Forecasting | Complete | 100% |
 | Phase 12 — Prescriptive Analytics | Complete | 100% |
 | Phase 13 — AI / Conversational BI | Complete (deferred ADR-006) | 100% |
-| Phase 14 — Web Application | In progress (per ADR-008) | 4% |
+| Phase 14 — Web Application | Complete | 100% |
 | Phase 15 — Security | Complete | 100% |
 | Phase 16 — Testing | Complete | 100% |
 | Phase 17 — Performance | Complete | 100% |
@@ -1386,13 +1399,13 @@ Update this log on every significant change. Never silently change architecture.
 | Phase 19 — Documentation | Complete | 100% |
 | Phase 20 — Final Validation & Demo | Complete | 100% |
 
-Overall: 88%. Based on completed tasks only, not estimation.
+Overall: 100%. Based on completed tasks only, not estimation.
 
 ## 8. TEST STATUS
 
 * Tests planned: generator reproducibility, schema/constraints, grain uniqueness, SCD current-flag, FK enforcement, ETL idempotency, watermark advance, DQ quarantine + score gate, DAX vs SQL gold (22 KPIs), forecast leakage + baseline comparison, hand-calc prescription, NL allowlist/injection (if built), analyst read-only negative, fresh-clone E2E seed 7.
-* Tests implemented: 19 (smoke 3, requirements 4, generator 4, etl/dq 3, analytics 4, e2e 1)
-* Tests passing: 19
+* Tests implemented: 60 (platform 19: smoke 3, requirements 4, generator 4, etl/dq 3, analytics 4, e2e 1; web 41: health 1, auth 3, rbac 4, foundation 4, overview 1, inventory 2, suppliers 1, logistics 1, forecasts 1, risks 1, recommendations 1, sources 2, etl 3, quality 1, alerts 2, admin 2, workflow 2, security 3, perf 2, ux 4)
+* Tests passing: 60
 * Tests failing: 0
 * Known issues: supplier quality score uses returns proxy until lot traceability (documented in machine_learning.md); .pbix click-ops assembly remains manual in Power BI Desktop.
 * Coverage: generator, ETL/DQ, warehouse grains, KPIs, forecasting baselines, prescriptions, E2E.
@@ -1464,6 +1477,8 @@ Rule honored: every model evaluated vs baseline before marking complete.
 | K1 | Supplier quality score uses returns proxy until lot traceability | Medium | Open/documented | Link returns to PO lots in v2 |
 | K2 | .pbix assembly is manual click-ops in Power BI Desktop | Low | Open | Follow powerbi/README from marts |
 | K3 | Synthetic demo intentionally shows low OTIF/OTD (degradation story) | Low | By design | None; real data will differ |
+| K4 | No login rate limiting in web v1 | Medium | Open/documented | Proxy limits or trusted network; see docs/rbac.md |
+| K5 | Postgres prod roles (009_roles.sql) specified but not live-tested; SQLite demo validated | Medium | Open/documented | Run against Postgres before prod claim |
 
 ## 13. BLOCKERS
 
@@ -1478,19 +1493,19 @@ Process: for every blocker record problem, impact, cause, possible solutions, cu
 
 The next concrete task is:
 
-> 14.2 Frontend/backend project structure: api/ package + frontend/ Vite scaffold + API client.
+> Acceptance review: push to remote + tag web-v1 (needs remote URL), or pick hardening backlog (Postgres prod run, login rate limiting, ARIMA/XGB lift study, .pbix assembly).
 
 Reason:
 
-> ADR-008 is locked. Structure is the prerequisite for auth, RBAC, and all modules.
+> Phase 14 is COMPLETE with 19/19 acceptance criteria verified and evidence recorded. Nothing in v1 scope remains.
 
 Prerequisites:
 
-> 14.1 done. No auth or endpoints yet.
+> None. Remote URL needed only for push/tag.
 
 Expected result:
 
-> api/ imports cleanly, frontend builds, plan tracker updated, tests still green.
+> Acceptance recorded in Change Log, or new task queued with its own acceptance criteria.
 
 Prerequisites:
 
