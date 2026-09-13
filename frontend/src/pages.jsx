@@ -373,7 +373,7 @@ export function Sources() {
             {data.items.map((s) => <option key={s.name} value={s.name}>{s.name}</option>)}
           </Select>
           <label className="sci-field"><span>CSV file (max 10MB)</span>
-            <input type="file" accept=".csv,text/csv" onChange={(e) => setFile(e.target.files[0] || null)} />
+            <input type="file" aria-label="CSV file" accept=".csv,text/csv" onChange={(e) => setFile(e.target.files[0] || null)} />
           </label>
           <Button variant="primary" type="submit" disabled={!file || busy}>{busy ? 'Staging…' : 'Validate & stage'}</Button>
         </form>
