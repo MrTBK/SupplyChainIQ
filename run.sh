@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 # run.sh — one-command runner for SupplyChainIQ (SYNTHETIC demo).
-# Usage: ./run.sh [--quick|--full|--tests-only]
+# Usage: ./run.sh [--quick|--full|--tests-only|--web]
 #   --quick (default): venv + install + seed-7/90d generate + ETL load + pytest
 #   --full: seed-42/730d generate + ETL load + pytest (slower, ~1 min)
 #   --tests-only: pytest only (uses hermetic tmp fixtures, no data needed)
+#   --web: build frontend if needed, then serve API + SPA at http://localhost:8766
+#          (foreground — Ctrl+C to stop; sign in admin/change-me, SYNTHETIC demo)
 set -euo pipefail
 
 MODE="${1:---quick}"
@@ -39,6 +41,22 @@ case "$MODE" in
   --tests-only)
     echo "[run] running tests..."
     .venv/bin/pytest -q
+    ;;
+  --web)
+    if [ ! -d frontend/node_modules ]; then
+      echo "[run] installing frontend deps..."
+      (cd frontend && npm install --no-audit --no-fund)
+    fi
+    if [ ! -f frontend/dist/index.html ]; then
+      echo "[run] building frontend..."
+      (cd frontend && npm run build)
+    fi
+    if [ ! -f data/warehouse.db ]; then
+      echo "[run] no warehouse found — generating quick demo data first..."
+      run_etl 7 90 DEMO7 data/generated/seed-7 data/warehouse.db
+    fi
+    echo "[run] starting web servers (foreground)..."
+    exec .venv/bin/python scripts/serve_web.py
     ;;
   --full)
     run_etl 42 730 DEMO42 data/generated/seed-42 data/warehouse.db

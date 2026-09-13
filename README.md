@@ -24,6 +24,12 @@ One command (venv + install + SYNTHETIC demo + ETL + tests):
 Web app (Phase 14, operational layer around the BI platform):
 
 ```bash
+./run.sh --web     # API + SPA at http://localhost:8766 (admin/change-me, SYNTHETIC demo)
+```
+
+Manual equivalent:
+
+```bash
 .venv/bin/uvicorn api.main:app --port 8000
 cd frontend && npm install && npm run dev   # http://localhost:5173, /api proxied
 ```

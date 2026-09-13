@@ -1312,6 +1312,9 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 - Evidence: 60 pytest green, `npm run build` green, browser screenshots (login, overview). Suite count: 19 (platform) + 41 (web).
 - Phase 14 COMPLETE. Overall 100%. Known limits: no rate limiting v1; SQLite demo validated (Postgres per 009_roles.sql untested live); supplier quality is returns-proxy.
 
+### 2026-09-14 (run.sh --web)
+- Added `./run.sh --web`: builds frontend if needed, ensures demo warehouse, serves API + SPA same-origin at http://localhost:8766 via scripts/serve_web.py (foreground, Ctrl+C stops). Verified live: SPA 200, health 200, login 200, authed KPIs through proxy.
+
 ## 6. ARCHITECTURE DECISIONS
 
 ### ADR-001 — PostgreSQL as Warehouse (APPROVED)
