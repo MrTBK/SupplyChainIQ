@@ -1341,7 +1341,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: api/routes/auth.py (LOGIN/LOGIN_FAILED/LOGOUT), api/routes/etl_runs.py (STARTED/COMPLETED/FAILED), api/routes/sources.py (UPLOAD_STAGED), api/routes/etl_runs.py (+missing CsrfChecked import found by suite), tests/test_security_audit.py, tests/test_api_rbac.py (audit schema in fixture). Validation: 2 audit tests green incl. no-secret scan of audit rows; suite 81 passed.
 
-- [ ] H8 observability (request IDs, structured log, readiness probe)
+- [x] H8 observability (request IDs, structured log, readiness probe)
+
+  Completed: 2026-09-14. Files: api/observability.py (X-Request-ID echo/generate, method/path/status/duration/uid log, no bodies/headers/cookies), api/main.py (/api/ready with app+warehouse checks), tests/test_security_observability.py. Validation: 3 tests green (unique IDs, secret-free logs incl. password login, readiness shape); suite 84 passed.
+
 - [ ] H9 frontend security/UX fixes (envelope parsing, 403/404, login states)
 - [ ] H10 secrets/config review
 - [ ] H11 dependency review
@@ -1421,6 +1424,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 ### 2026-09-14 (H7 audit expansion)
 - LOGIN/FAILED/LOGOUT + ETL STARTED/COMPLETED/FAILED + UPLOAD_STAGED; secret-free rows verified by test.
 - Evidence: 2 audit tests green; suite 81 passed.
+
+### 2026-09-14 (H8 observability)
+- Request IDs, secret-free access log, /api/ready vs /api/health split.
+- Evidence: 3 tests green; suite 84 passed.
 
 ## 6. ARCHITECTURE DECISIONS
 

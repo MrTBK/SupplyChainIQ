@@ -8,8 +8,10 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from .alerts import init_alerts_schema
 from .auth import seed_admin
 from .cors import apply_cors
+from .db import app_db, warehouse_ro
 from .foundation import http_exception_handler, unhandled_handler
 from .headers import SecurityHeadersMiddleware
+from .observability import REQUEST_ID_HEADER, ObservabilityMiddleware
 from .routes.admin import router as admin_router
 from .routes.alerts import router as alerts_router
 from .routes.auth import router as auth_router
@@ -33,6 +35,7 @@ def create_app() -> FastAPI:
     from .users import init_admin_schema
     init_admin_schema()
     app = FastAPI(title="SupplyChainIQ API", version="0.1.0")
+    app.add_middleware(ObservabilityMiddleware)
     app.add_middleware(SecurityHeadersMiddleware)
     apply_cors(app)
     app.add_exception_handler(HTTPException, http_exception_handler)
@@ -42,6 +45,27 @@ def create_app() -> FastAPI:
     @app.get("/api/health")
     def health() -> dict:
         return {"status": "ok", "version": "0.1.0"}
+
+    @app.get("/api/ready")
+    def ready() -> dict:
+        """Readiness: app DB + warehouse reachable. Liveness stays on /api/health."""
+        checks: dict[str, str] = {}
+        try:
+            con = app_db()
+            con.execute("SELECT 1").fetchone()
+            con.close()
+            checks["app_db"] = "ok"
+        except Exception as e:  # noqa: BLE001 - surfaced as status, never raised
+            checks["app_db"] = f"fail: {type(e).__name__}"
+        try:
+            con = warehouse_ro()
+            con.execute("SELECT 1").fetchone()
+            con.close()
+            checks["warehouse"] = "ok"
+        except Exception as e:  # noqa: BLE001
+            checks["warehouse"] = f"fail: {type(e).__name__}"
+        status = "ok" if all(v == "ok" for v in checks.values()) else "degraded"
+        return {"status": status, "checks": checks}
 
     app.include_router(admin_router)
     app.include_router(alerts_router)
