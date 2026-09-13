@@ -16,6 +16,7 @@ from .routes.forecasts import router as forecasts_router
 from .routes.inventory import router as inventory_router
 from .routes.logistics import router as logistics_router
 from .routes.overview import router as overview_router
+from .routes.quality import router as quality_router
 from .routes.recommendations import router as recommendations_router
 from .routes.risks import router as risks_router
 from .routes.sources import router as sources_router
@@ -41,6 +42,7 @@ def create_app() -> FastAPI:
     app.include_router(inventory_router)
     app.include_router(logistics_router)
     app.include_router(overview_router)
+    app.include_router(quality_router)
     app.include_router(recommendations_router)
     app.include_router(risks_router)
     app.include_router(sources_router)

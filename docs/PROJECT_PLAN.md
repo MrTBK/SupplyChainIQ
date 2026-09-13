@@ -1178,7 +1178,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: api/services/etl_runs.py (history + allowlisted trigger), api/routes/etl_runs.py, tests/test_api_etl.py. Validation: 3 tests green (history shape/counts, traversal + unknown-dir 422, analyst 403, success path loads + history grows). Fixed stale module-level DB path (lazy config) found by failing test.
 
-- [ ] 14.15 Data quality monitoring
+- [x] 14.15 Data quality monitoring
+
+  Completed: 2026-09-14. Files: api/services/quality.py (gate math vs 0.98, quarantine drill-down, yml-parsed rule catalog), api/routes/quality.py, tests/test_api_quality.py. Validation: gate/threshold correct, R02 drill-down works, 8 rules with R01-R08 parity.
+
 - [ ] 14.16 Alerts center
 - [ ] 14.17 Administration (RBAC minimum + audit log)
 - [ ] 14.18 Frontend integration testing
