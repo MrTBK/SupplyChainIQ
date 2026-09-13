@@ -1,0 +1,96 @@
+/* Branded login: navy identity panel + form card (F4). */
+
+.sci-login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background: var(--background);
+}
+
+.sci-login-card {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) minmax(300px, 380px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  width: 100%;
+  max-width: 760px;
+}
+
+.sci-login-brand {
+  background: var(--surface-navy);
+  color: var(--on-navy);
+  padding: var(--space-8) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.sci-login-brand .sci-brand {
+  font-size: 1.25rem;
+}
+
+.sci-login-brand p {
+  color: rgb(255 255 255 / 0.82);
+  margin: 0;
+}
+
+.sci-login-brand ul {
+  list-style: none;
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-size: var(--text-secondary-size);
+  color: rgb(255 255 255 / 0.82);
+}
+
+.sci-login-brand li {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.sci-login-brand li svg {
+  color: var(--accent);
+}
+
+.sci-login-form {
+  padding: var(--space-8) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.sci-login-form h1 {
+  margin-bottom: 0;
+}
+
+.sci-login-row {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-end;
+}
+
+.sci-login-row .sci-field {
+  flex: 1;
+}
+
+@media (max-width: 720px) {
+  .sci-login-card {
+    grid-template-columns: 1fr;
+  }
+
+  .sci-login-brand {
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .sci-login-brand ul {
+    display: none;
+  }
+}

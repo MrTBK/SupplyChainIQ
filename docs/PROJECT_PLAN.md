@@ -1426,7 +1426,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: frontend/src/components.{css,jsx} (Button/Input/Select/Badge/Card/KpiCard/PageHeader/EmptyState/Skeleton/DataTable+Pagination/Alert/Modal/Toasts), charts.jsx (Line+projection/Bars/Sparkline, titled/described), tokens.js (JS palette mirror), hooks.jsx ErrorPanel detokenized, tests/test_frontend_library.py. Validation: 5 lib tests green (exports, chart a11y, token-only rule, mirror parity, zero new deps); build green.
 
-- [ ] F4 branded login
+- [x] F4 branded login
+
+  Completed: 2026-09-14. Files: frontend/src/Login.jsx (navy brand panel + capabilities + component form), login.css (responsive stack), icons.jsx (shared BrandMark), Shell.jsx (dedupe). Validation: build green; browser screenshot shows branded split card; all login states preserved.
+
 - [ ] F5 overview/inventory/suppliers/logistics/forecasts redesign
 - [ ] F6 risks/recs/sources/ETL/quality/admin redesign
 - [ ] F7 responsive + a11y QA

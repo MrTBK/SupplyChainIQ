@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
-import Icon from './icons.jsx'
+import Icon, { BrandMark } from './icons.jsx'
 import { useApi } from './hooks.jsx'
 import './shell.css'
 
@@ -54,17 +54,6 @@ const TITLES = {
   '/quality': 'Data quality',
   '/alerts': 'Alerts',
   '/admin': 'Administration',
-}
-
-function BrandMark() {
-  return (
-    <span className="sci-brand-mark" aria-hidden="true">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 3 4.5 7.5v9L12 21l7.5-4.5v-9L12 3Z" />
-        <path d="M4.5 7.5 12 12l7.5-4.5M12 12v9" />
-      </svg>
-    </span>
-  )
 }
 
 function AlertsBell() {

@@ -44,3 +44,14 @@ export default function Icon({ name, size = 18, label }) {
     </svg>
   )
 }
+
+export function BrandMark({ size = 30 }) {
+  return (
+    <span className="sci-brand-mark" style={{ width: size, height: size }} aria-hidden="true">
+      <svg width={size * 0.55} height={size * 0.55} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 3 4.5 7.5v9L12 21l7.5-4.5v-9L12 3Z" />
+        <path d="M4.5 7.5 12 12l7.5-4.5M12 12v9" />
+      </svg>
+    </span>
+  )
+}
