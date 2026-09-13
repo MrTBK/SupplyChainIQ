@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Badge, Button, Card, DataTable, EmptyState, KpiCard, PageHeader, Select, TableSkeleton } from './components.jsx'
+import { Alert, Badge, Button, Card, DataTable, EmptyState, Input, KpiCard, Modal, PageHeader, Select, TableSkeleton, Toasts } from './components.jsx'
+import { patch, post, remove, upload } from './api.js'
 import { BarChart, LineChart } from './charts.jsx'
 import { ErrorPanel, useApi } from './hooks.jsx'
 
@@ -337,12 +338,47 @@ export function Recommendations() {
 }
 
 export function Sources() {
-  const { data, error, status } = useApi('/api/data-sources')
+  const { data, error, status, reload } = useApi('/api/data-sources')
+  const [file, setFile] = useState(null)
+  const [target, setTarget] = useState('products')
+  const [busy, setBusy] = useState(false)
+  const [toasts, setToasts] = useState([])
+  const [formError, setFormError] = useState(null)
   if (error) return <ErrorPanel error={error} status={status} />
   if (!data) return <><PageHeader title="Data sources" blurb="Ingestion contracts and their health." /><Loading /></>
+  const submit = async (e) => {
+    e.preventDefault()
+    if (!file || busy) return
+    setBusy(true)
+    setFormError(null)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await upload(`/api/data-sources/${target}/upload`, fd)
+      setToasts((t) => [...t, { id: Date.now(), text: `Staged ${res.rows} rows as batch ${res.batch}. Load it via ETL.` }])
+      setFile(null)
+      reload()
+    } catch (err) {
+      setFormError(err.message)
+    } finally {
+      setBusy(false)
+    }
+  }
   return (
     <>
       <PageHeader title="Data sources" blurb="Uploads validate and stage only — loading runs through ETL." />
+      <Card title="Stage a CSV upload">
+        <form onSubmit={submit} style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+          <Select label="Target source" value={target} onChange={(e) => setTarget(e.target.value)}>
+            {data.items.map((s) => <option key={s.name} value={s.name}>{s.name}</option>)}
+          </Select>
+          <label className="sci-field"><span>CSV file (max 10MB)</span>
+            <input type="file" accept=".csv,text/csv" onChange={(e) => setFile(e.target.files[0] || null)} />
+          </label>
+          <Button variant="primary" type="submit" disabled={!file || busy}>{busy ? 'Staging…' : 'Validate & stage'}</Button>
+        </form>
+        {formError && <div style={{ marginTop: 'var(--space-2)' }}><Alert tone="danger">{formError}</Alert></div>}
+      </Card>
       <DataTable
         cols={[
           { key: 'name', label: 'Source' },
@@ -352,17 +388,43 @@ export function Sources() {
         ]}
         rows={data.items}
       />
+      <Toasts items={toasts} />
     </>
   )
 }
 
 export function Etl() {
-  const { data, error, status } = useApi('/api/etl-runs', { limit: 100 })
+  const { data, error, status, reload } = useApi('/api/etl-runs', { limit: 100 })
+  const [confirming, setConfirming] = useState(false)
+  const [src, setSrc] = useState('data/generated/seed-7')
+  const [busy, setBusy] = useState(false)
+  const [detail, setDetail] = useState(null)
+  const [toasts, setToasts] = useState([])
+  const [formError, setFormError] = useState(null)
   if (error) return <ErrorPanel error={error} status={status} />
   if (!data) return <><PageHeader title="ETL monitoring" blurb="Run history, newest first." /><Loading /></>
+  const trigger = async () => {
+    setBusy(true)
+    setFormError(null)
+    try {
+      const res = await post('/api/etl-runs/trigger', { src })
+      setToasts((t) => [...t, { id: Date.now(), text: `Run ${res.run_id}: ${res.quarantined} quarantined in ${res.duration_s}s.` }])
+      setConfirming(false)
+      reload()
+    } catch (err) {
+      setFormError(err.message)
+    } finally {
+      setBusy(false)
+    }
+  }
   return (
     <>
-      <PageHeader title="ETL monitoring" blurb="Triggering runs lives behind the API for permitted roles." />
+      <PageHeader
+        title="ETL monitoring"
+        blurb="Triggering runs a real pipeline load from an allowlisted data directory."
+        actions={<Button variant="secondary" onClick={() => { setFormError(null); setConfirming(true) }}>Trigger run</Button>}
+      />
+      {formError && <Alert tone="danger">{formError}</Alert>}
       <DataTable
         cols={[
           { key: 'run_id', label: 'Run' },
@@ -372,9 +434,33 @@ export function Etl() {
           { key: 'rows_accepted', label: 'Accepted', numeric: true },
           { key: 'rows_rejected', label: 'Rejected', numeric: true },
           { key: 'duration_s', label: 'Secs', numeric: true },
+          { key: 'run_id', label: '', sortable: false, render: (_, r) => (
+            <Button variant="secondary" onClick={() => setDetail(r)}>Detail</Button>
+          ) },
         ]}
         rows={data.items}
       />
+      {confirming && (
+        <Modal title="Trigger ETL run" onClose={() => setConfirming(false)} actions={
+          <>
+            <Button variant="secondary" onClick={() => setConfirming(false)}>Cancel</Button>
+            <Button variant="primary" onClick={trigger} disabled={busy}>{busy ? 'Running…' : 'Run pipeline'}</Button>
+          </>
+        }>
+          <Input label="Source directory (inside data/)" value={src} onChange={(e) => setSrc(e.target.value)} help="Allowlisted to data/ paths only. Traversal is rejected." />
+        </Modal>
+      )}
+      {detail && (
+        <Modal title={`Run ${detail.run_id}`} onClose={() => setDetail(null)} actions={
+          <Button variant="secondary" onClick={() => setDetail(null)}>Close</Button>
+        }>
+          <p><b>Source</b> {detail.source} · <b>Status</b> {detail.status}</p>
+          <p><b>Read</b> {detail.rows_read} · <b>Accepted</b> {detail.rows_accepted} · <b>Rejected</b> {detail.rows_rejected}</p>
+          <p><b>Started</b> {detail.started_at} · <b>Ended</b> {detail.ended_at || '—'} · <b>Duration</b> {detail.duration_s}s</p>
+          {detail.errors && detail.errors !== '[]' && <p><b>Errors</b> <code>{detail.errors}</code></p>}
+        </Modal>
+      )}
+      <Toasts items={toasts} />
     </>
   )
 }
@@ -416,9 +502,19 @@ export function Quality() {
 }
 
 export function Alerts() {
-  const { data, error, status } = useApi('/api/alerts', { limit: 100 })
+  const { data, error, status, reload } = useApi('/api/alerts', { limit: 100 })
+  const [toasts, setToasts] = useState([])
   if (error) return <ErrorPanel error={error} status={status} />
   if (!data) return <><PageHeader title="Alerts" blurb="Persisted, deduplicated evaluations." /><Loading /></>
+  const ack = async (id) => {
+    try {
+      await patch(`/api/alerts/${id}`, { status: 'acknowledged' })
+      setToasts((t) => [...t, { id: Date.now(), text: `Alert ${id} acknowledged.` }])
+      reload()
+    } catch (err) {
+      setToasts((t) => [...t, { id: Date.now(), text: `Acknowledge failed: ${err.message}` }])
+    }
+  }
   return (
     <>
       <PageHeader title="Alerts" blurb="Acknowledge in the risk workflow; evaluation reuses the risk engine." />
@@ -430,10 +526,14 @@ export function Alerts() {
             { key: 'entity_id', label: 'Entity' },
             { key: 'status', label: 'Status', render: (v) => <Badge>{v}</Badge> },
             { key: 'reason', label: 'Reason', sortable: false },
+            { key: 'id', label: '', sortable: false, render: (v, r) => (
+              r.status === 'open' ? <Button variant="secondary" onClick={() => ack(v)}>Acknowledge</Button> : null
+            ) },
           ]}
           rows={data.items}
         />
       )}
+      <Toasts items={toasts} />
     </>
   )
 }
@@ -441,16 +541,85 @@ export function Alerts() {
 export function Admin() {
   const users = useApi('/api/users')
   const audit = useApi('/api/audit', { limit: 20 })
+  const [creating, setCreating] = useState(false)
+  const [form, setForm] = useState({ username: '', password: '', role: 'analyst' })
+  const [formError, setFormError] = useState(null)
+  const [confirmDelete, setConfirmDelete] = useState(null)
+  const [toasts, setToasts] = useState([])
+  const create = async () => {
+    setFormError(null)
+    try {
+      await post('/api/users', form)
+      setToasts((t) => [...t, { id: Date.now(), text: `User ${form.username} created.` }])
+      setCreating(false)
+      setForm({ username: '', password: '', role: 'analyst' })
+      users.reload()
+    } catch (err) {
+      setFormError(err.message)
+    }
+  }
+  const destroy = async () => {
+    try {
+      await remove(`/api/users/${confirmDelete.id}`)
+      setToasts((t) => [...t, { id: Date.now(), text: `User ${confirmDelete.username} deleted.` }])
+      setConfirmDelete(null)
+      users.reload()
+    } catch (err) {
+      setFormError(err.message)
+      setConfirmDelete(null)
+    }
+  }
   return (
     <>
-      <PageHeader title="Administration" blurb="Users, roles, and audit trail. Administrator only." />
+      <PageHeader
+        title="Administration"
+        blurb="Users, roles, and audit trail. Administrator only."
+        actions={<Button variant="primary" onClick={() => { setFormError(null); setCreating(true) }}>Create user</Button>}
+      />
+      {formError && <Alert tone="danger">{formError}</Alert>}
       {users.error ? <ErrorPanel error={users.error} status={users.status} />
         : !users.data ? <Loading />
-        : <DataTable cols={[{ key: 'username', label: 'User' }, { key: 'role', label: 'Role' }, { key: 'created_at', label: 'Created' }]} rows={users.data.items} />}
+        : <DataTable
+            cols={[
+              { key: 'username', label: 'User' },
+              { key: 'role', label: 'Role' },
+              { key: 'created_at', label: 'Created' },
+              { key: 'id', label: '', sortable: false, render: (v, r) => (
+                <Button variant="secondary" onClick={() => setConfirmDelete(r)}>Delete</Button>
+              ) },
+            ]}
+            rows={users.data.items}
+          />}
       <h2>Audit · latest 20</h2>
       {audit.error ? <ErrorPanel error={audit.error} status={audit.status} />
         : !audit.data ? <Loading />
         : <DataTable cols={[{ key: 'ts', label: 'Time' }, { key: 'actor', label: 'Actor' }, { key: 'action', label: 'Action' }, { key: 'detail', label: 'Detail', sortable: false }]} rows={audit.data.items} />}
+      {creating && (
+        <Modal title="Create user" onClose={() => setCreating(false)} actions={
+          <>
+            <Button variant="secondary" onClick={() => setCreating(false)}>Cancel</Button>
+            <Button variant="primary" onClick={create}>Create</Button>
+          </>
+        }>
+          <Input label="Username" value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} autoComplete="off" />
+          <Input label="Password (min 8 chars)" type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} autoComplete="new-password" />
+          <Select label="Role" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
+            {['analyst', 'executive', 'supply_manager', 'procurement_manager', 'inventory_manager', 'logistics_manager', 'administrator'].map((r) => <option key={r} value={r}>{r}</option>)}
+          </Select>
+          {formError && <Alert tone="danger">{formError}</Alert>}
+        </Modal>
+      )}
+      {confirmDelete && (
+        <Modal title={`Delete ${confirmDelete.username}?`} onClose={() => setConfirmDelete(null)} actions={
+          <>
+            <Button variant="secondary" onClick={() => setConfirmDelete(null)}>Cancel</Button>
+            <Button variant="danger" onClick={destroy}>Delete user</Button>
+          </>
+        }>
+          <p>This revokes their sessions immediately. The last administrator cannot be deleted.</p>
+        </Modal>
+      )}
+      <Toasts items={toasts} />
     </>
   )
 }

@@ -1434,7 +1434,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Backend: api/services/demand.py + routes/demand.py (GET /api/demand/trend, SQL-aggregated, bounded months) + test — the single justified read addition. Frontend: pages.jsx rewritten (KPI rows, Line/Bar/SVG charts, bands + badges, sortable DataTables, filters, drill panel, skeletons/empty states). Validation: demand test green; build green; 5 browser screenshots reviewed; visual QA found + fixed LineChart projection misalignment (absolute indexing).
 
-- [ ] F6 risks/recs/sources/ETL/quality/admin redesign
+- [x] F6 ops actions + ops page polish
+
+  Completed: 2026-09-14. Files: frontend api.js (patch/upload/remove helpers), hooks.jsx (reload), pages.jsx (upload form + toasts, trigger modal + run detail, ack buttons, user create/delete modals), scripts/web_e2e.py (DELETE + header/error proxy fixes). Validation: browser-verified trigger toast + run history, ack toast, create modal + DB-proof delete; upload form renders (file-pick not drivable by harness; endpoint fully API-tested). Visual QA fixed 2 real issues: missing Input import (new JSX-resolve test) and chart projection misalignment. Demo state restored (test user removed, 266 test alerts acked).
+
 - [ ] F7 responsive + a11y QA
 - [ ] F8 visual + functional regression + docs
 

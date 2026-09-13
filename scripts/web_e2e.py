@@ -12,6 +12,7 @@ import os
 import subprocess
 import threading
 import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -27,27 +28,36 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def _proxy(self):
         url = f"http://127.0.0.1:{API_PORT}{self.path}"
         data = None
-        if self.command in ("POST", "PATCH", "PUT"):
+        if self.command in ("POST", "PATCH", "PUT", "DELETE"):
             data = self.rfile.read(int(self.headers.get("Content-Length", 0)))
-        req = urllib.request.Request(url, data=data, method=self.command,
-                                     headers={"Content-Type": "application/json",
-                                              "Cookie": self.headers.get("Cookie", "")})
+        headers = {"Cookie": self.headers.get("Cookie", "")}
+        for h in ("X-CSRF-Token", "X-Request-ID"):
+            if self.headers.get(h):
+                headers[h] = self.headers[h]
+        if data is not None:
+            headers["Content-Type"] = "application/json"
+        req = urllib.request.Request(url, data=data, method=self.command, headers=headers)
         try:
-            with urllib.request.urlopen(req, timeout=30) as r:
-                body = r.read()
-                self.send_response(r.status)
-                if r.headers.get("Set-Cookie"):
-                    self.send_header("Set-Cookie", r.headers["Set-Cookie"])
-                self.send_header("Content-Type", "application/json")
-                self.send_header("Content-Length", str(len(body)))
-                self.end_headers()
-                self.wfile.write(body)
+            with urllib.request.urlopen(req, timeout=60) as r:
+                self._send_proxy_response(r.status, r.read(), r.headers.get_all("Set-Cookie"))
+        except urllib.error.HTTPError as e:
+            # pass upstream errors through with status + body (never mask as 502)
+            self._send_proxy_response(e.code, e.read(), e.headers.get_all("Set-Cookie"))
         except Exception as e:  # noqa: BLE001 - surfaced to browser for diagnosis
             msg = f'{{"error": {str(e)!r}}}'.encode()
             self.send_response(502)
             self.send_header("Content-Length", str(len(msg)))
             self.end_headers()
             self.wfile.write(msg)
+
+    def _send_proxy_response(self, status, body, cookies):
+        self.send_response(status)
+        for cookie in cookies or []:
+            self.send_header("Set-Cookie", cookie)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
 
     def do_GET(self):
         if self.path.startswith("/api/"):
@@ -61,6 +71,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self._proxy()
 
     def do_PATCH(self):
+        self._proxy()
+
+    def do_PUT(self):
+        self._proxy()
+
+    def do_DELETE(self):
         self._proxy()
 
     def log_message(self, *a):

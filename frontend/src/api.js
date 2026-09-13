@@ -31,3 +31,18 @@ export async function api(path, opts = {}) {
 
 export const get = (p) => api(p)
 export const post = (p, data) => api(p, { method: 'POST', body: JSON.stringify(data) })
+export const patch = (p, data) => api(p, { method: 'PATCH', body: JSON.stringify(data) })
+export async function upload(path, formData) {
+  const headers = {}
+  const t = csrfToken()
+  if (t) headers['X-CSRF-Token'] = t
+  const r = await fetch(path, { method: 'POST', credentials: 'same-origin', headers, body: formData })
+  if (!r.ok) {
+    const body = await r.json().catch(() => ({}))
+    throw new ApiError(r.status, (body.error && body.error.message) || `API ${r.status} on ${path}`)
+  }
+  return r.json()
+}
+export async function remove(path) {
+  return api(path, { method: 'DELETE' })
+}

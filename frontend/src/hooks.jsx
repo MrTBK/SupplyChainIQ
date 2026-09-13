@@ -5,17 +5,21 @@ export function useApi(path, params) {
   const [data, setData] = useState(null)
   const [error, setError] = useState(null)
   const [status, setStatus] = useState(null)
+  const [nonce, setNonce] = useState(0)
   const qs = params ? '?' + new URLSearchParams(params).toString() : ''
   useEffect(() => {
+    let live = true
     setData(null)
     setError(null)
     setStatus(null)
-    get(path + qs).then(setData).catch((e) => {
+    get(path + qs).then((d) => live && setData(d)).catch((e) => {
+      if (!live) return
       setError(e.message)
       setStatus(e.status || null)
     })
-  }, [path + qs]);
-  return { data, error, status }
+    return () => { live = false }
+  }, [path + qs, nonce]);
+  return { data, error, status, reload: () => setNonce((n) => n + 1) }
 }
 
 export function ErrorPanel({ error, status }) {

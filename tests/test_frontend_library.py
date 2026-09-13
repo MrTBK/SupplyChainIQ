@@ -61,3 +61,16 @@ def test_token_mirror_parity():
 def test_no_new_dependencies():
     pkg = json.loads((SRC.parent / "package.json").read_text())
     assert set(pkg["dependencies"]) == {"react", "react-dom", "react-router-dom"}, pkg["dependencies"]
+
+
+def test_all_jsx_components_resolve():
+    """Every <Capitalized> tag must be imported or defined locally (catches Input-style misses)."""
+    for f in ["pages.jsx", "main.jsx", "Shell.jsx", "Login.jsx", "components.jsx", "charts.jsx", "hooks.jsx"]:
+        text = (SRC / f).read_text()
+        used = set(re.findall(r"<([A-Z][A-Za-z0-9]*)", text))
+        imported = set(re.findall(r"^import\s+(\w+)", text, re.MULTILINE))
+        for group in re.findall(r"import[^{]*\{([^}]*)\}", text):
+            imported.update(n.strip().split(" as ")[0] for n in group.split(",") if n.strip())
+        defined = set(re.findall(r"(?:export )?(?:function|class|const|let|var) ([A-Z][A-Za-z0-9]*)", text))
+        unknown = used - imported - defined - {"React"}
+        assert not unknown, (f, unknown)
