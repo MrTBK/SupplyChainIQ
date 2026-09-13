@@ -17,21 +17,21 @@
 ## 2. Current Status
 
 ```text
-Current Phase: Phase 21 — Production Hardening (H1 next)
-Current Milestone: Gap assessment done, 14 hardening tasks queued
-Overall Progress: 93%
+Current Phase: Phase 21 — Production Hardening COMPLETE (H1-H14)
+Current Milestone: Hardened web v1, full suite green, audit clean
+Overall Progress: 100%
 
 Completed:
-✓ Phases 0-20 all COMPLETE incl. Phase 14 web app (14.1-14.24)
-✓ 60 pytest green + `npm run build` green + 11-route browser walk green
-✓ Hardening gap assessment (2026-09-14): 8 P0 + 6 P1 gaps, sessions store is top gap
+✓ Phases 0-20 all COMPLETE incl. Phase 14 web app
+✓ Phase 21 H1-H14 COMPLETE with regression tests per fix
+✓ Final audit: zero critical findings; K4/K5 + 4 accepted dev-only dep notes remain
 
 In Progress:
-→ Phase 21 task setup (plan section + tracker)
+→ None. Awaiting acceptance / remote push + tag
 
 Next:
-□ H1 server-side sessions + revocation + disabled users
-□ H2 login rate limiting → H3 CSRF → H4 CORS → H5 headers …
+□ Push to remote + tag (needs remote URL)
+□ Optional: Redis limiter for multi-worker, Postgres prod run, .pbix assembly
 
 Blockers:
 None
@@ -40,23 +40,23 @@ Last Updated:
 2026-09-14
 
 Last Completed Task:
-Hardening gap assessment (no code changed)
+H14 final security audit — clean
 
 Next Concrete Task:
-H1 server-side session store
+Acceptance review (see Section 14 Next Action)
 ```
 
 | Metric | Value |
 |---|---|
-| Current phase | Phase 21 — Production Hardening |
-| Current milestone | Gap assessment done, H1 next |
-| Overall progress | 93% (hardening queued; all prior work complete) |
-| Completed phases | Phases 0-20 COMPLETE 2026-09-14 |
-| Active phase | Phase 21 |
-| Next phase | Acceptance (push/tag) after H14 |
+| Current phase | Phase 21 — Production Hardening COMPLETE |
+| Current milestone | Hardened web v1, audit clean |
+| Overall progress | 100% (all phases + H1-H14 with evidence) |
+| Completed phases | Phases 0-21 COMPLETE 2026-09-14 |
+| Active phase | None (awaiting acceptance) |
+| Next phase | Acceptance (push/tag) + optional hardening follow-ups |
 | Current blocker | None |
 | Last updated | 2026-09-14 |
-| Last completed task | Hardening gap assessment |
+| Last completed task | H14 final security audit |
 | Next concrete task | See Section 14 Next Action |
 
 ## 3. ROADMAP
@@ -1361,8 +1361,13 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: api/guards.py (1MB JSON cap, upload path exempt), api/main.py (TrustedHostMiddleware iff SCI_TRUSTED_HOSTS set), tests/test_security_config.py. Validation: 4 config tests green (warning, no-tracked-secrets, 413 + exempt upload, hosts off/on).
 
-- [ ] H13 docs/security.md + ADRs
-- [ ] H14 final read-only security audit
+- [x] H13 docs/security.md + ADRs
+
+  Completed: 2026-09-14. Files: docs/security.md (rewritten, 16 topics each with implementation + test pointers, honest limits), docs/decisions.md (ADR-009 sessions+CSRF, chronological order fixed). Validation: every claim traces to code/tests; no untested guarantees.
+
+- [x] H14 final read-only security audit
+
+  Completed: 2026-09-14. Sweeps: no token storage/JWT/wildcard-CORS/debug flags in src (node_modules hits are third-party scroll/debug libs, not our code); no string-formatted SQL (f-strings carry fixed keywords only, values parameterized); no secret assignments or secret logging; str(e) details are controlled validation strings; every route covered by require_perm/current_user/CsrfChecked (login intentionally public). Full suite green (see below).
 
 ## Change Log
 
@@ -1450,6 +1455,11 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 - npm audit: 4 vulns, all dev-only/unreachable — accepted with rationale, no blind majors.
 - Evidence: 4 config tests green.
 
+### 2026-09-14 (H13/H14 docs + final audit)
+- docs/security.md rewritten (16 topics, all claims traced); ADR-009 recorded in order.
+- Final sweeps: no token storage/JWT/wildcard/debug in src; no formatted SQL; no secret logging; all routes authorized; str(e) details controlled.
+- Phase 21 COMPLETE. Overall 100%.
+
 ## 6. ARCHITECTURE DECISIONS
 
 ### ADR-001 — PostgreSQL as Warehouse (APPROVED)
@@ -1536,15 +1546,16 @@ Update this log on every significant change. Never silently change architecture.
 | Phase 18 — Deployment | Complete | 100% |
 | Phase 19 — Documentation | Complete | 100% |
 | Phase 20 — Final Validation & Demo | Complete | 100% |
-| Phase 21 — Production Hardening | In progress (H1 done) | 7% |
+| Phase 21 — Production Hardening | Complete | 100% |
 
-Overall: 93%. Based on completed tasks only, not estimation.
+Overall: 100%. Based on completed tasks only, not estimation.
 
 ## 8. TEST STATUS
 
 * Tests planned: generator reproducibility, schema/constraints, grain uniqueness, SCD current-flag, FK enforcement, ETL idempotency, watermark advance, DQ quarantine + score gate, DAX vs SQL gold (22 KPIs), forecast leakage + baseline comparison, hand-calc prescription, NL allowlist/injection (if built), analyst read-only negative, fresh-clone E2E seed 7.
-* Tests implemented: 60 (platform 19: smoke 3, requirements 4, generator 4, etl/dq 3, analytics 4, e2e 1; web 41: health 1, auth 3, rbac 4, foundation 4, overview 1, inventory 2, suppliers 1, logistics 1, forecasts 1, risks 1, recommendations 1, sources 2, etl 3, quality 1, alerts 2, admin 2, workflow 2, security 3, perf 2, ux 4)
-* Tests passing: 60
+* Tests implemented: 89 (platform 19 + web 41 + hardening 29: sessions 4, ratelimit 2, csrf 3, cors 3, headers 2, upload 5, audit 2, observability 3, config 4, ux-security 1 [test_ux.py now 5])
+* Tests passing: 89
+* Evidence: `.venv/bin/pytest -q` = 89 passed 2026-09-14, pristine output (2 third-party starlette warnings only).
 * Tests failing: 0
 * Known issues: supplier quality score uses returns proxy until lot traceability (documented in machine_learning.md); .pbix click-ops assembly remains manual in Power BI Desktop.
 * Coverage: generator, ETL/DQ, warehouse grains, KPIs, forecasting baselines, prescriptions, E2E.
@@ -1632,19 +1643,19 @@ Process: for every blocker record problem, impact, cause, possible solutions, cu
 
 The next concrete task is:
 
-> H2 login rate limiting (429 per IP+account, configurable, regression-tested).
+> Acceptance review: push to remote + tag (needs remote URL), or pick follow-ups (Redis limiter, Postgres prod run, .pbix assembly).
 
 Reason:
 
-> Gap assessment top P0: sessions are client-side signed cookies with no revocation, no idle timeout, no rotation, no disabled state. All later hardening (CSRF, audit, logout tests) builds on this.
+> Phases 0-21 COMPLETE with evidence: 89-test suite green, browser E2E green, audit clean, K4/K5 + accepted dep notes documented.
 
 Prerequisites:
 
-> None. Keep /api/auth shapes unchanged.
+> None. Remote URL needed only for push/tag.
 
 Expected result:
 
-> Login/logout/me behave identically from the client's view; sessions table in app.db; 401 after logout, after expiry, and for disabled/deleted users; regression tests green; full suite green.
+> Acceptance recorded in Change Log, or new task queued with its own acceptance criteria.
 ```
 
 ---

@@ -73,3 +73,13 @@ RBAC matrix: executive (read all ops, no trigger/upload/admin), supply/procureme
 Reason: User directive 2026-09-14 requires usable operational interface; stack fits existing Python codebase, installed ui-styling skill, and Node 22 availability. Power BI keeps deep analytics; web app owns monitoring/workflows.
 
 Consequences: requirements.txt gains fastapi/uvicorn + hashing lib; new api/, frontend/, alerts table; E2E/security test suites; .pbix remains separate.
+
+## ADR-009 — Server-side sessions + CSRF double-submit, no JWT (APPROVED 2026-09-14)
+
+Decision: Replace Starlette signed-cookie session content with random session IDs in app.db (idle 30m, absolute 8h, revocable, disabled-aware); CSRF via session-bound double-submit tokens. No JWT: single web client, server-side revocation required.
+
+Alternatives: keep signed cookies (rejected — no revocation); JWT bearer (rejected — stateless conflicts with revocation + disabled-user requirements, no multi-client need).
+
+Reason: Directive §§2-5 require revocable server-side sessions and CSRF for cookie auth with minimal new dependencies (stdlib + existing stack).
+
+Consequences: sessions + csrf_token columns (migrated), login/logout shapes unchanged, 8 mutating routes carry CsrfChecked, frontend sends header automatically.
