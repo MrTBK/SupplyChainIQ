@@ -16,9 +16,10 @@ export function useApi(path, params) {
 export function Table({ cols, rows }) {
   if (!rows || !rows.length) return <p>No rows.</p>
   return (
+    <div style={{ overflowX: 'auto' }}>
     <table border="1" cellPadding="6" style={{ borderCollapse: 'collapse', width: '100%' }}>
       <thead>
-        <tr>{cols.map((c) => <th key={c}>{c}</th>)}</tr>
+        <tr>{cols.map((c) => <th key={c} scope="col">{c}</th>)}</tr>
       </thead>
       <tbody>
         {rows.map((r, i) => (
@@ -26,6 +27,7 @@ export function Table({ cols, rows }) {
         ))}
       </tbody>
     </table>
+    </div>
   )
 }
 

@@ -21,7 +21,7 @@ export function Inventory() {
   return (
     <>
       <h1>Inventory</h1>
-      <input placeholder="Search product…" value={q} onChange={(e) => setQ(e.target.value)} />
+      <label>Search <input aria-label="Search products" placeholder="Search product…" value={q} onChange={(e) => setQ(e.target.value)} /></label>
       {!data ? <p>Loading…</p> : (
         <>
           <p>{data.total} rows. <a href="/api/inventory">raw</a></p>
@@ -70,7 +70,7 @@ export function Forecasts() {
   return (
     <>
       <h1>Forecasts</h1>
-      <input placeholder="Filter product…" value={product} onChange={(e) => setProduct(e.target.value)} />
+      <label>Product filter <input aria-label="Filter forecasts by product" placeholder="Filter product…" value={product} onChange={(e) => setProduct(e.target.value)} /></label>
       {!data ? <p>Loading…</p> : data.items.map((f) => (
         <div key={f.product_id + f.warehouse_id} style={{ border: '1px solid #ddd', margin: '0.5rem 0', padding: '0.5rem' }}>
           <b>{f.product_id} @ {f.warehouse_id}</b> — model {f.model}, WAPE {f.wape},
