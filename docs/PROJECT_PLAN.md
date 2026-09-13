@@ -1182,7 +1182,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: api/services/quality.py (gate math vs 0.98, quarantine drill-down, yml-parsed rule catalog), api/routes/quality.py, tests/test_api_quality.py. Validation: gate/threshold correct, R02 drill-down works, 8 rules with R01-R08 parity.
 
-- [ ] 14.16 Alerts center
+- [x] 14.16 Alerts center
+
+  Completed: 2026-09-14. Files: api/alerts.py (app.db store, day-dedupe, ack/resolve), api/routes/alerts.py, tests/test_api_alerts.py. Validation: 2 tests green (dedupe second-evaluate stores 0, ack flips counts, 404/422 paths, analyst evaluate 403).
+
 - [ ] 14.17 Administration (RBAC minimum + audit log)
 - [ ] 14.18 Frontend integration testing
 - [ ] 14.19 Security testing

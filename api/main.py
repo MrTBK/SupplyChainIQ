@@ -7,9 +7,11 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from starlette.middleware.sessions import SessionMiddleware
 
+from .alerts import init_alerts_schema
 from .auth import seed_admin
 from .config import SECRET_KEY
 from .foundation import http_exception_handler, unhandled_handler
+from .routes.alerts import router as alerts_router
 from .routes.auth import router as auth_router
 from .routes.etl_runs import router as etl_runs_router
 from .routes.forecasts import router as forecasts_router
@@ -25,6 +27,7 @@ from .routes.suppliers import router as suppliers_router
 
 def create_app() -> FastAPI:
     seed_admin()
+    init_alerts_schema()
     app = FastAPI(title="SupplyChainIQ API", version="0.1.0")
     app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY, session_cookie="sci_session",
                        max_age=8 * 3600, same_site="lax", https_only=False)
@@ -36,6 +39,7 @@ def create_app() -> FastAPI:
     def health() -> dict:
         return {"status": "ok", "version": "0.1.0"}
 
+    app.include_router(alerts_router)
     app.include_router(auth_router)
     app.include_router(etl_runs_router)
     app.include_router(forecasts_router)
