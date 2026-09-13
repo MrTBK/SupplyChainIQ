@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 import io
 import sqlite3
 from datetime import datetime, timezone
+from pathlib import Path
 
 SOURCES = ["products", "suppliers", "warehouses", "customers", "carriers",
            "purchase_orders", "po_lines", "sales_orders", "so_lines",
@@ -29,6 +31,15 @@ REQUIRED_COLUMNS: dict[str, list[str]] = {
 }
 
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
+MAX_ROWS = 200_000
+MAX_COLS = 100
+MAX_CELL = 20_000
+
+# Advisory only: real validation is CSV parsing + schema. Anything else is rejected.
+ALLOWED_MIME = frozenset({
+    "text/csv", "text/plain", "application/vnd.ms-excel",
+    "application/octet-stream", "",
+})
 
 
 def source_status(con: sqlite3.Connection) -> list[dict]:
@@ -49,11 +60,15 @@ def source_status(con: sqlite3.Connection) -> list[dict]:
     return out
 
 
-def validate_upload(name: str, content: bytes) -> dict:
+def validate_upload(name: str, content: bytes, content_type: str = "") -> dict:
     if name not in REQUIRED_COLUMNS:
         return {"ok": False, "error": f"Unknown source '{name}'"}
+    if content_type.split(";")[0].strip().lower() not in ALLOWED_MIME:
+        return {"ok": False, "error": f"Unsupported media type '{content_type}'"}
     if len(content) > MAX_UPLOAD_BYTES:
         return {"ok": False, "error": "File exceeds 10MB limit"}
+    if not content.strip():
+        return {"ok": False, "error": "Empty file"}
     try:
         text = content.decode("utf-8-sig")
         rows = list(csv.DictReader(io.StringIO(text)))
@@ -61,16 +76,43 @@ def validate_upload(name: str, content: bytes) -> dict:
         return {"ok": False, "error": "File is not valid UTF-8 CSV"}
     if not rows:
         return {"ok": False, "error": "CSV has no data rows"}
-    missing = [c for c in REQUIRED_COLUMNS[name] if c not in (rows[0].keys() or [])]
+    if len(rows) > MAX_ROWS:
+        return {"ok": False, "error": f"Row count {len(rows)} exceeds limit {MAX_ROWS}"}
+    cols = list(rows[0].keys() or [])
+    if len(cols) > MAX_COLS:
+        return {"ok": False, "error": f"Column count {len(cols)} exceeds limit {MAX_COLS}"}
+    for r in rows:
+        for c in cols:
+            v = r.get(c) or ""
+            if len(v) > MAX_CELL:
+                return {"ok": False, "error": f"Cell exceeds {MAX_CELL} chars in column '{c}'"}
+    missing = [c for c in REQUIRED_COLUMNS[name] if c not in cols]
     if missing:
         return {"ok": False, "error": f"Missing columns: {', '.join(missing)}"}
     bad = sum(1 for r in rows if any((r.get(c) in (None, "")) for c in REQUIRED_COLUMNS[name]))
-    return {"ok": True, "rows": len(rows), "rows_rejected_preview": bad,
+    digest = hashlib.sha256(content).hexdigest()
+    return {"ok": True, "rows": len(rows), "rows_rejected_preview": bad, "sha256": digest,
             "next_step": "File staged for ETL. Loading runs via POST /api/etl-runs/trigger or CLI."}
 
 
+def find_duplicate(raw_dir: str, name: str, digest: str) -> str:
+    """Same content staged before? Returns existing batch or ''."""
+    base = Path(raw_dir)
+    if not base.is_dir():
+        return ""
+    for f in sorted(base.glob(f"*/{name}.csv")):
+        try:
+            if hashlib.sha256(f.read_bytes()).hexdigest() == digest:
+                return f.parent.name
+        except OSError:
+            continue
+    return ""
+
+
 def stage_upload(raw_dir: str, name: str, content: bytes, batch: str) -> str:
-    from pathlib import Path
+    # Defense in depth: fixed server-side filename; source allowlisted upstream.
+    if name not in REQUIRED_COLUMNS or Path(name).name != name:
+        raise ValueError(f"Refused unsafe source name '{name}'")
     dest = Path(raw_dir) / batch / f"{name}.csv"
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_bytes(content)

@@ -1333,7 +1333,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: api/headers.py (nosniff/referrer/permissions/strict-CSP always; HSTS iff COOKIE_SECURE), api/main.py (wired), tests/test_security_headers.py. Validation: 2 tests green (matrix + conditional HSTS); suite 74 passed.
 
-- [ ] H6 upload hardening (MIME, traversal tests, row/column caps)
+- [x] H6 upload hardening (MIME, traversal tests, row/column caps)
+
+  Completed: 2026-09-14. Files: api/services/sources.py (MIME allowlist, 200k-row/100-col/20k-cell caps, sha256 duplicate detection, stage_upload guard), api/routes/sources.py (409 duplicates), tests/test_security_upload.py. Validation: 5 tests green (traversal + evil filename neutered, MIME/empty/garbage 422, shape caps, duplicate 409, never-served proof); suite 79 passed.
+
 - [ ] H7 audit expansion (LOGIN/FAILED/LOGOUT/ETL/upload events)
 - [ ] H8 observability (request IDs, structured log, readiness probe)
 - [ ] H9 frontend security/UX fixes (envelope parsing, 403/404, login states)
@@ -1403,6 +1406,14 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 ### 2026-09-14 (H3 CSRF protection)
 - Double-submit tokens bound to server sessions; 8 mutating routes guarded; frontend auto-sends header.
 - Evidence: 3 tests green; suite 69 passed.
+
+### 2026-09-14 (H4+H5 CORS + headers)
+- Same-origin default, exact-origin opt-in, wildcard refused; strict API headers, conditional HSTS.
+- Evidence: 5 tests green; suite 74 passed.
+
+### 2026-09-14 (H6 upload hardening)
+- MIME allowlist, shape caps, duplicate 409s, traversal guards, staged-never-served proof.
+- Evidence: 5 upload-attack tests green; suite 79 passed.
 
 ## 6. ARCHITECTURE DECISIONS
 
