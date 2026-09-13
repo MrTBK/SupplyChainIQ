@@ -21,6 +21,15 @@ One command (venv + install + SYNTHETIC demo + ETL + tests):
 ./run.sh --tests-only
 ```
 
+Web app (Phase 14, operational layer around the BI platform):
+
+```bash
+.venv/bin/uvicorn api.main:app --port 8000
+cd frontend && npm install && npm run dev   # http://localhost:5173, /api proxied
+```
+
+API reference: `docs/api.md`. RBAC: `docs/rbac.md`. Full plan: `docs/PROJECT_PLAN.md`.
+
 Manual equivalent:
 
 ```bash
