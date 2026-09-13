@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+
+# Env / secrets - never commit real env
+config/.env
+*.env
+
+# Data - generated and raw landings are reproducible, do not commit large data
+data/raw/*
+data/generated/*
+data/staging/*
+!data/**/.gitkeep
+
+# Power BI temp
+~$*.pbix
+*.tmp
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
