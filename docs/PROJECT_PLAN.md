@@ -1146,7 +1146,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: api/services/overview.py, api/routes/overview.py (GET /api/kpis/overview, ops:read), tests/api_fixtures.py, tests/test_api_overview.py. Validation: values match gold logic (sales_lines 1, quarantine >= 2 on fixture), 401 pre-login.
 
-- [ ] 14.7 Inventory module (+ product drill)
+- [x] 14.7 Inventory module (+ product drill)
+
+  Completed: 2026-09-14. Files: api/services/inventory.py (stock_list with search/warehouse/low-stock/coverage filter reusing coverage_days; product_drill with demand history, forecast, p50 lead, safety, reorder+risk), api/routes/inventory.py, tests/test_api_inventory.py. Validation: 2 tests green (list/search/empty/pagination, drill explanation keys + 404).
+
 - [ ] 14.8 Supplier module
 - [ ] 14.9 Logistics module
 - [ ] 14.10 Forecasting module (model + WAPE labeled)
