@@ -1124,7 +1124,11 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: docs/decisions.md (ADR-008), docs/PROJECT_PLAN.md. Validation: stack fits repo (Python API reuses analytics/forecasting/etl; Node 22 present; ui-styling covers React).
 
-- [ ] 14.2 Frontend/backend project structure
+- [x] 14.2 Frontend/backend project structure
+
+  Completed: 2026-09-14. Files: api/__init__.py, api/config.py, api/db.py (warehouse read-only + app.db), api/main.py (app factory + /api/health), tests/test_api_health.py, frontend/ (package.json, vite.config with /api proxy, index.html, src/api.js, App.jsx nav for 12 modules, main.jsx), requirements.txt (+fastapi/uvicorn/httpx/itsdangerous), .gitignore (node_modules/dist). Validation: health test green; `npm run build` succeeds (33 modules). 2 warnings are third-party starlette deprecations, zero failures.
+
+- [ ] 14.3 Authentication foundation (sessions)
 - [ ] 14.3 Authentication foundation (sessions)
 - [ ] 14.4 RBAC
 - [ ] 14.5 API foundation (errors, pagination, read-only analytics access)
