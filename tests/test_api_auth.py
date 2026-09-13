@@ -34,7 +34,8 @@ def test_password_hashing_roundtrip():
 def test_login_me_logout(client):
     r = client.post("/api/auth/login", json={"username": "admin", "password": "s3cret-test"})
     assert r.status_code == 200 and r.json()["role"] == "administrator"
-    assert client.get("/api/auth/me").status_code == 200
+    me = client.get("/api/auth/me").json()
+    assert me["username"] == "admin" and me["role"] == "administrator"  # shell needs username on reload
     token = client.cookies.get("sci_csrf")
     client.headers.update({"X-CSRF-Token": token})
     assert client.post("/api/auth/logout").status_code == 200

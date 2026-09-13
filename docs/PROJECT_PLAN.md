@@ -1418,7 +1418,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: frontend/src/theme.css (semantic tokens per §5, type scale, spacing, restrained shape/motion, focus + reduced-motion), main.jsx (wired), docs/decisions.md (ADR-010 hand-rolled CSS/SVG, light-default), tests/test_frontend_tokens.py. Validation: 3 token tests green; `npm run build` green.
 
-- [ ] F2 app shell (topbar/sidebar/nav/role-awareness/responsive)
+- [x] F2 app shell (topbar/sidebar/nav/role-awareness/responsive)
+
+  Completed: 2026-09-14. Files: frontend/src/icons.jsx (18 geometric stroke icons), shell.css (navy topbar, grouped sidebar, collapse rail, mobile drawer, user menu), Shell.jsx (groups, active states, adminOnly filter, persisted collapse, breadcrumb, live alerts bell), main.jsx (rewired), api/routes/auth.py (/me now returns username — reload crash fix), tests/test_api_auth.py (username assertion). Validation: build green; browser screenshots (full/grouped/collapsed/analyst-no-Admin); visual QA found + fixed reload-while-logged-in crash (missing username).
+
 - [ ] F3 component library + SVG charts + icons
 - [ ] F4 branded login
 - [ ] F5 overview/inventory/suppliers/logistics/forecasts redesign

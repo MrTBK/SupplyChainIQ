@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from ..auth import authenticate
 from ..config import COOKIE_SECURE, SESSION_COOKIE
 from ..csrf import CSRF_COOKIE, CsrfChecked
+from ..db import app_db
 from ..rate_limit import clear_login, login_allowed, record_login_failure
 from ..rbac import current_user
 from ..sessions import ABSOLUTE_HOURS, create_session, destroy_session, get_session
@@ -62,4 +63,7 @@ def logout(request: Request, response: Response) -> dict:
 
 @router.get("/me")
 def me(user: dict = Depends(current_user)) -> dict:
-    return {"id": user["uid"], "role": user["role"]}
+    con = app_db()
+    row = con.execute("SELECT username FROM users WHERE id=?", (user["uid"],)).fetchone()
+    con.close()
+    return {"id": user["uid"], "username": row["username"] if row else "?", "role": user["role"]}
