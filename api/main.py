@@ -13,6 +13,7 @@ from .foundation import http_exception_handler, unhandled_handler
 from .routes.auth import router as auth_router
 from .routes.inventory import router as inventory_router
 from .routes.overview import router as overview_router
+from .routes.suppliers import router as suppliers_router
 
 
 def create_app() -> FastAPI:
@@ -31,6 +32,7 @@ def create_app() -> FastAPI:
     app.include_router(auth_router)
     app.include_router(inventory_router)
     app.include_router(overview_router)
+    app.include_router(suppliers_router)
     return app
 
 

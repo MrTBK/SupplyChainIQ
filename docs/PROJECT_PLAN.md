@@ -1150,7 +1150,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: api/services/inventory.py (stock_list with search/warehouse/low-stock/coverage filter reusing coverage_days; product_drill with demand history, forecast, p50 lead, safety, reorder+risk), api/routes/inventory.py, tests/test_api_inventory.py. Validation: 2 tests green (list/search/empty/pagination, drill explanation keys + 404).
 
-- [ ] 14.8 Supplier module
+- [x] 14.8 Supplier module
+
+  Completed: 2026-09-14. Files: api/services/suppliers.py (spend/OTIF/score/p50/p90 ranking + monthly trend detail), api/routes/suppliers.py, tests/test_api_suppliers.py. Validation: ranking/detail/404 green; fixed empty-filter SQL via condition list.
+
 - [ ] 14.9 Logistics module
 - [ ] 14.10 Forecasting module (model + WAPE labeled)
 - [ ] 14.11 Risk center (requires alerts table)
