@@ -1,0 +1,19 @@
+# DQ rules — measurable, each maps to quarantine rule_id.
+# R01 completeness: supplier/product/warehouse/customer/carrier ids not null.
+# R02 validity: qty >= 0 (except movement delta), costs >= 0.
+# R03 consistency: delivery_date >= shipment_date.
+# R04 referential: PO must reference existing supplier.
+# R05 referential: movement/snapshot/sales must reference existing product+warehouse.
+# R06 completeness: promised_date present for OTIF scope.
+# R07 uniqueness: business-key UNIQUE enforced (so line, po line, shipment, return, movement).
+# R08 timeliness: batch freshness < 26h (checked by scheduler, stored in watermark).
+DQ_THRESHOLD: 0.98
+rules:
+  - {id: R01, dimension: completeness, severity: high}
+  - {id: R02, dimension: validity, severity: high}
+  - {id: R03, dimension: consistency, severity: high}
+  - {id: R04, dimension: referential, severity: high}
+  - {id: R05, dimension: referential, severity: high}
+  - {id: R06, dimension: completeness, severity: medium}
+  - {id: R07, dimension: uniqueness, severity: medium}
+  - {id: R08, dimension: timeliness, severity: medium}

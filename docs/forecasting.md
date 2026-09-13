@@ -1,0 +1,3 @@
+# Forecasting — SupplyChainIQ
+
+Problem → predict monthly qty per product/warehouse. Target qty_next_month. Features: lags 1/3/6/12, rolling mean, seasonality index, promo flag, price (documented; code uses lags + rolling via history). Baselines mandatory: naive, MA3, SES. Candidates: ARIMA/XGB/Prophet only with lift proof. Validation: rolling origin from 6-month train. Metrics: MAE/RMSE/WAPE (WAPE primary). Selection: simplest within 2% WAPE of best; else keep naive with reason. Limits: new SKUs (<6 months) and intermittent demand flagged, no forecast or wide interval. Code: forecasting/forecast.py. Tests: leakage (prefix-only), baseline comparison.

@@ -13,6 +13,9 @@ config/.env
 data/raw/*
 data/generated/*
 data/staging/*
+data/*.db
+data/*.sqlite*
+*.db
 !data/**/.gitkeep
 
 # Power BI temp

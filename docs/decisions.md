@@ -47,3 +47,15 @@ Reason: Best practice, leakage control, explainability.
 Decision: No CRUD app. FastAPI/monitoring UI only if proven useful (Phase 14 gate).
 
 Reason: Core value is BI/data platform. Prevent scope creep.
+
+## ADR-006 — Conversational BI deferred with guardrails specified (APPROVED 2026-09-13)
+
+Decision: Defer NL-to-SQL build. Contract locked if built later: allowlisted tables, read-only analyst role, LIMIT 2000, parameterized SQL only, full logging, numbers only from query results.
+
+Reason: Warehouse + BI must prove stable first. Security design done, code deferred to avoid uncontrolled LLM SQL.
+
+## ADR-007 — No application layer in v1 beyond pipeline + BI (APPROVED 2026-09-13)
+
+Decision: No web app in v1. Monitoring via logs + DQ views + Power BI. FastAPI reconsidered only on proven ops need.
+
+Reason: Protect data-platform focus per ADR-005.
