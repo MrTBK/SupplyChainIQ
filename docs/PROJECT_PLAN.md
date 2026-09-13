@@ -1138,7 +1138,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
   Completed: 2026-09-14. Files: api/rbac.py (PERMISSIONS matrix, current_role, require_perm), tests/test_api_rbac.py. Validation: 4 tests green (matrix covers all roles, executive 200/403 split, admin all-access, anonymous 401s).
 
 - [ ] 14.5 API foundation (errors, pagination, read-only analytics access)
-- [ ] 14.5 API foundation (errors, pagination, read-only analytics access)
+- [x] 14.5 API foundation (errors, pagination, read-only analytics access)
+
+  Completed: 2026-09-14. Files: api/foundation.py (envelope, paging caps, allowlisted ORDER BY, LIKE escaping), api/main.py (both HTTPException types handled), tests/test_api_foundation.py. Validation: 4 tests green (envelope hides internals, limit capped 500, injection sort rejected, warehouse write raises OperationalError, app 404 enveloped). Full suite 31 passed.
+
 - [ ] 14.6 Executive overview module
 - [ ] 14.7 Inventory module (+ product drill)
 - [ ] 14.8 Supplier module
