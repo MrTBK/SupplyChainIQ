@@ -1133,7 +1133,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: api/auth.py (PBKDF2 stdlib, 200k iters, per-user salt), api/routes/auth.py (login/logout/me), api/main.py (router + admin seed), tests/test_api_auth.py. Validation: 3 auth tests green (roundtrip, login→me→logout→401, bad-credential 401s). Login UI deferred to 14.18.
 
-- [ ] 14.4 RBAC
+- [x] 14.4 RBAC
+
+  Completed: 2026-09-14. Files: api/rbac.py (PERMISSIONS matrix, current_role, require_perm), tests/test_api_rbac.py. Validation: 4 tests green (matrix covers all roles, executive 200/403 split, admin all-access, anonymous 401s).
+
 - [ ] 14.5 API foundation (errors, pagination, read-only analytics access)
 - [ ] 14.5 API foundation (errors, pagination, read-only analytics access)
 - [ ] 14.6 Executive overview module
