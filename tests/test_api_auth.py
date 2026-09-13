@@ -35,6 +35,8 @@ def test_login_me_logout(client):
     r = client.post("/api/auth/login", json={"username": "admin", "password": "s3cret-test"})
     assert r.status_code == 200 and r.json()["role"] == "administrator"
     assert client.get("/api/auth/me").status_code == 200
+    token = client.cookies.get("sci_csrf")
+    client.headers.update({"X-CSRF-Token": token})
     assert client.post("/api/auth/logout").status_code == 200
     assert client.get("/api/auth/me").status_code == 401
 

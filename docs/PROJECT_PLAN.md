@@ -1321,7 +1321,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: api/rate_limit.py (sliding window per IP+account, env-tunable, in-memory with Redis-upgrade note), api/routes/auth.py (429 + Retry-After, success clears), api/foundation.py (envelope preserves exc headers), tests/test_security_ratelimit.py. Validation: 2 tests green (block at 6th failure, correct-password refused while blocked, success resets streak); suite 66 passed.
 
-- [ ] H3 CSRF protection for cookie mutations
+- [x] H3 CSRF protection for cookie mutations
+
+  Completed: 2026-09-14. Files: api/csrf.py (double-submit, session-bound, compare_digest, safe methods exempt), api/sessions.py (csrf_token column + migration, fail-closed), api/routes/auth.py (dual-cookie login/logout), CsrfChecked on all 8 mutating routes, frontend/src/api.js (auto header), tests/test_security_csrf.py, 7 older tests updated to new flow. Validation: 3 CSRF tests green (missing/wrong/stale-token 403s, login exempt, GETs unaffected); suite 69 passed.
+
 - [ ] H4 explicit CORS policy
 - [ ] H5 security headers middleware
 - [ ] H6 upload hardening (MIME, traversal tests, row/column caps)
@@ -1390,6 +1393,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 ### 2026-09-14 (H2 login rate limiting)
 - Sliding window 5/300s per IP+account; 429 envelope + Retry-After; success clears bucket.
 - Evidence: 2 tests green; suite 66 passed.
+
+### 2026-09-14 (H3 CSRF protection)
+- Double-submit tokens bound to server sessions; 8 mutating routes guarded; frontend auto-sends header.
+- Evidence: 3 tests green; suite 69 passed.
 
 ## 6. ARCHITECTURE DECISIONS
 

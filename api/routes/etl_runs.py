@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from .. import config
 from ..db import warehouse_ro
 from ..foundation import parse_paging
+from ..csrf import CsrfChecked
 from ..rbac import require_perm
 from ..services.etl_runs import run_history, trigger
 
@@ -29,7 +30,7 @@ class TriggerIn(BaseModel):
     batch: str = ""
 
 
-@router.post("/trigger", dependencies=[Depends(require_perm("etl:trigger"))])
+@router.post("/trigger", dependencies=[Depends(require_perm("etl:trigger")), CsrfChecked])
 def post_trigger(body: TriggerIn) -> dict:
     try:
         return trigger(body.src, config.REPO, config.WAREHOUSE_DB, body.batch or "")

@@ -30,6 +30,7 @@ def _client(tmp_path, monkeypatch):
 
 def _login(c, user):
     assert c.post("/api/auth/login", json={"username": user, "password": "pw"}).status_code == 200
+    c.headers.update({"X-CSRF-Token": c.cookies.get("sci_csrf")})
 
 
 def test_role_violation_sweep(tmp_path, monkeypatch):

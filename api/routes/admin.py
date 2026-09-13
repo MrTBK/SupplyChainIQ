@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from .. import users as store
+from ..csrf import CsrfChecked
 from ..rbac import current_role, current_user, require_perm
 
 router = APIRouter(prefix="/api", tags=["admin"])
@@ -24,7 +25,7 @@ class UserIn(BaseModel):
     role: str
 
 
-@router.post("/users", dependencies=[_guard])
+@router.post("/users", dependencies=[_guard, CsrfChecked])
 def post_user(body: UserIn, actor: dict = Depends(current_user)) -> dict:
     try:
         user = store.create_user(body.username, body.password, body.role)
@@ -41,7 +42,7 @@ class UserPatch(BaseModel):
     disabled: bool | None = None
 
 
-@router.patch("/users/{uid}", dependencies=[Depends(require_perm("admin:users"))])
+@router.patch("/users/{uid}", dependencies=[Depends(require_perm("admin:users")), CsrfChecked])
 def patch_user(uid: int, body: UserPatch, actor: dict = Depends(current_user)) -> dict:
     try:
         user = store.update_user(uid, role=body.role, password=body.password, disabled=body.disabled)
@@ -53,7 +54,7 @@ def patch_user(uid: int, body: UserPatch, actor: dict = Depends(current_user)) -
     return user
 
 
-@router.delete("/users/{uid}", dependencies=[Depends(require_perm("admin:users"))])
+@router.delete("/users/{uid}", dependencies=[Depends(require_perm("admin:users")), CsrfChecked])
 def delete_user(uid: int, actor: dict = Depends(current_user),
                 role: str = Depends(current_role)) -> dict:
     result = store.delete_user(uid, actor["uid"])

@@ -28,6 +28,7 @@ def _client(tmp_path, monkeypatch, role="supply_manager", user="sup"):
     c = TestClient(create_app())
     c.__enter__()
     assert c.post("/api/auth/login", json={"username": user, "password": "pw"}).status_code == 200
+    c.headers.update({"X-CSRF-Token": c.cookies.get("sci_csrf")})
     return c
 
 

@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 from ..auth import authenticate
 from ..config import COOKIE_SECURE, SESSION_COOKIE
+from ..csrf import CSRF_COOKIE, CsrfChecked
 from ..rate_limit import clear_login, login_allowed, record_login_failure
 from ..rbac import current_user
 from ..sessions import ABSOLUTE_HOURS, create_session, destroy_session
@@ -37,14 +38,18 @@ def login(body: LoginIn, request: Request, response: Response) -> dict:
         record_login_failure(key)
         raise HTTPException(status_code=401, detail="Invalid username or password")
     clear_login(key)
-    _set_session_cookie(response, create_session(user["id"]))
+    sid, csrf = create_session(user["id"])
+    _set_session_cookie(response, sid)
+    response.set_cookie(CSRF_COOKIE, csrf, samesite="lax", secure=COOKIE_SECURE, path="/",
+                        max_age=ABSOLUTE_HOURS * 3600)
     return {"id": user["id"], "username": user["username"], "role": user["role"]}
 
 
-@router.post("/logout")
+@router.post("/logout", dependencies=[CsrfChecked])
 def logout(request: Request, response: Response) -> dict:
     destroy_session(request.cookies.get(SESSION_COOKIE, ""))
     response.delete_cookie(SESSION_COOKIE, path="/")
+    response.delete_cookie(CSRF_COOKIE, path="/")
     return {"status": "logged out"}
 
 

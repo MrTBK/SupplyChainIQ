@@ -24,11 +24,17 @@ def _client(tmp_path, monkeypatch):
     return c
 
 
+def _authed(c):
+    assert c.post("/api/auth/login", json={"username": "mgr", "password": "pw"}).status_code == 200
+    c.headers.update({"X-CSRF-Token": c.cookies.get("sci_csrf")})
+
+
 def test_critical_workflow(tmp_path, monkeypatch):
     c = _client(tmp_path, monkeypatch)
     try:
         # login -> dashboard -> inventory -> product detail -> forecast -> recommendation
         assert c.post("/api/auth/login", json={"username": "mgr", "password": "pw"}).status_code == 200
+        c.headers.update({"X-CSRF-Token": c.cookies.get("sci_csrf")})
         assert c.get("/api/kpis/overview").status_code == 200
         inv = c.get("/api/inventory").json()
         assert inv["total"] >= 1
@@ -46,10 +52,10 @@ def test_critical_workflow(tmp_path, monkeypatch):
 def test_risk_to_ack_loop(tmp_path, monkeypatch):
     c = _client(tmp_path, monkeypatch)
     try:
-        assert c.post("/api/auth/login", json={"username": "mgr", "password": "pw"}).status_code == 200
+        _authed(c)
         assert c.get("/api/risks").status_code == 200
         assert c.get("/api/recommendations").status_code == 200
-        ev = c.post("/api/alerts/evaluate").json()
+        ev = c.post("/api/alerts/evaluate").json()  # csrf header already set above
         assert ev["open_total"] >= 0
         lst = c.get("/api/alerts").json()
         if lst["total"]:

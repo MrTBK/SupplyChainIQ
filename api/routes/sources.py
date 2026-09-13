@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 
 from ..db import warehouse_ro
+from ..csrf import CsrfChecked
 from ..rbac import require_perm
 from ..services.sources import stage_upload, source_status, validate_upload
 
@@ -23,7 +24,7 @@ def get_sources() -> dict:
     return {"total": len(items), "items": items}
 
 
-@router.post("/{name}/upload", dependencies=[Depends(require_perm("sources:upload"))])
+@router.post("/{name}/upload", dependencies=[Depends(require_perm("sources:upload")), CsrfChecked])
 async def upload_source(name: str, file: UploadFile = File(...)) -> dict:
     content = await file.read()
     report = validate_upload(name, content)

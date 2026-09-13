@@ -23,8 +23,13 @@ def init_sessions_schema() -> None:
         user_id INTEGER NOT NULL,
         created_at TEXT NOT NULL,
         last_seen TEXT NOT NULL,
-        expires_at TEXT NOT NULL)""")
+        expires_at TEXT NOT NULL,
+        csrf_token TEXT NOT NULL DEFAULT '')""")
     con.execute("CREATE INDEX IF NOT EXISTS ix_sessions_user ON sessions(user_id)")
+    # migrations for pre-H3 app.db files (old sessions fail closed on mutations until re-login)
+    cols = [r[1] for r in con.execute("PRAGMA table_info(sessions)").fetchall()]
+    if "csrf_token" not in cols:
+        con.execute("ALTER TABLE sessions ADD COLUMN csrf_token TEXT NOT NULL DEFAULT ''")
     # users.disabled may predate this migration on existing app.db files
     cols = [r[1] for r in con.execute("PRAGMA table_info(users)").fetchall()]
     if "disabled" not in cols:
@@ -33,18 +38,19 @@ def init_sessions_schema() -> None:
     con.close()
 
 
-def create_session(user_id: int) -> str:
-    """Fresh random ID per login (rotation/fixation-safe). Multi-device allowed."""
+def create_session(user_id: int) -> tuple[str, str]:
+    """Fresh random ID + CSRF token per login (rotation/fixation-safe). Returns (sid, csrf)."""
     sid = secrets.token_urlsafe(32)
+    csrf = secrets.token_urlsafe(32)
     now = _now()
     con = app_db()
-    con.execute("INSERT INTO sessions (id, user_id, created_at, last_seen, expires_at)"
-                " VALUES (?,?,?,?,?)",
+    con.execute("INSERT INTO sessions (id, user_id, created_at, last_seen, expires_at, csrf_token)"
+                " VALUES (?,?,?,?,?,?)",
                 (sid, user_id, now.isoformat(), now.isoformat(),
-                 (now + timedelta(hours=ABSOLUTE_HOURS)).isoformat()))
+                 (now + timedelta(hours=ABSOLUTE_HOURS)).isoformat(), csrf))
     con.commit()
     con.close()
-    return sid
+    return sid, csrf
 
 
 def get_session(sid: str) -> dict | None:

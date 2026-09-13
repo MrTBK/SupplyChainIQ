@@ -22,3 +22,13 @@ def open_ro(db: Path) -> sqlite3.Connection:
     con = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
     con.row_factory = sqlite3.Row
     return con
+
+
+def login_with_csrf(client, username: str, password: str) -> str:
+    """Log in and attach the CSRF header, mirroring frontend/src/api.js behavior."""
+    r = client.post("/api/auth/login", json={"username": username, "password": password})
+    assert r.status_code == 200, r.text
+    token = client.cookies.get("sci_csrf")
+    assert token, "login must issue a CSRF cookie"
+    client.headers.update({"X-CSRF-Token": token})
+    return token

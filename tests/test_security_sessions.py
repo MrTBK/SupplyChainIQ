@@ -29,6 +29,7 @@ def _login(c, user="u1"):
     r = c.post("/api/auth/login", json={"username": user, "password": "pw"})
     assert r.status_code == 200
     assert "httponly" in r.headers.get("set-cookie", "").lower()
+    c.headers.update({"X-CSRF-Token": c.cookies.get("sci_csrf")})
     return r
 
 

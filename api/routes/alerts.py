@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from ..alerts import list_alerts, set_status, store_evaluation
 from ..db import warehouse_ro
 from ..foundation import parse_paging
+from ..csrf import CsrfChecked
 from ..rbac import require_perm
 from ..services.risks import evaluate
 
@@ -22,7 +23,7 @@ def get_alerts(status: str = "", severity: str = "", kind: str = "",
                        limit=pg["limit"], offset=pg["offset"])
 
 
-@router.post("/evaluate", dependencies=[Depends(require_perm("etl:trigger"))])
+@router.post("/evaluate", dependencies=[Depends(require_perm("etl:trigger")), CsrfChecked])
 def post_evaluate() -> dict:
     con = warehouse_ro()
     try:
@@ -36,7 +37,7 @@ class AckIn(BaseModel):
     status: str = "acknowledged"
 
 
-@router.patch("/{alert_id}", dependencies=[Depends(require_perm("ops:read"))])
+@router.patch("/{alert_id}", dependencies=[Depends(require_perm("ops:read")), CsrfChecked])
 def patch_alert(alert_id: int, body: AckIn) -> dict:
     try:
         ok = set_status(alert_id, body.status)
