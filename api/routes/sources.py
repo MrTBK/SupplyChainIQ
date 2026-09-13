@@ -8,8 +8,9 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 
 from ..db import warehouse_ro
 from ..csrf import CsrfChecked
-from ..rbac import require_perm
+from ..rbac import current_user, require_perm
 from ..services.sources import find_duplicate, stage_upload, source_status, validate_upload
+from ..users import audit
 
 router = APIRouter(prefix="/api/data-sources", tags=["sources"])
 
@@ -25,7 +26,8 @@ def get_sources() -> dict:
 
 
 @router.post("/{name}/upload", dependencies=[Depends(require_perm("sources:upload")), CsrfChecked])
-async def upload_source(name: str, file: UploadFile = File(...)) -> dict:
+async def upload_source(name: str, file: UploadFile = File(...),
+                        actor: dict = Depends(current_user)) -> dict:
     content = await file.read()
     report = validate_upload(name, content, file.content_type or "")
     if not report["ok"]:
@@ -35,4 +37,5 @@ async def upload_source(name: str, file: UploadFile = File(...)) -> dict:
         raise HTTPException(status_code=409, detail=f"Identical file already staged in batch '{dup}'")
     batch = "upload-" + datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
     dest = stage_upload("data/raw", name, content, batch)
+    audit(str(actor["uid"]), "UPLOAD_STAGED", f"source={name} batch={batch} rows={report['rows']}")
     return {**report, "staged_at": dest, "batch": batch}

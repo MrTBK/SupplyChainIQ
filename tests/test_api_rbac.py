@@ -25,7 +25,9 @@ def app(tmp_path, monkeypatch):
     con.close()
     from api.routes.auth import router as auth_router
     from api.sessions import init_sessions_schema
+    from api.users import init_admin_schema
     init_sessions_schema()
+    init_admin_schema()
     app = FastAPI()
     app.include_router(auth_router)
 

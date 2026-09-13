@@ -10,7 +10,8 @@ from ..config import COOKIE_SECURE, SESSION_COOKIE
 from ..csrf import CSRF_COOKIE, CsrfChecked
 from ..rate_limit import clear_login, login_allowed, record_login_failure
 from ..rbac import current_user
-from ..sessions import ABSOLUTE_HOURS, create_session, destroy_session
+from ..sessions import ABSOLUTE_HOURS, create_session, destroy_session, get_session
+from ..users import audit
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -36,8 +37,10 @@ def login(body: LoginIn, request: Request, response: Response) -> dict:
     user = authenticate(body.username.strip(), body.password)
     if not user:
         record_login_failure(key)
+        audit(body.username.strip()[:64], "LOGIN_FAILED", "invalid credentials")
         raise HTTPException(status_code=401, detail="Invalid username or password")
     clear_login(key)
+    audit(user["username"], "LOGIN", f"id={user['id']}")
     sid, csrf = create_session(user["id"])
     _set_session_cookie(response, sid)
     response.set_cookie(CSRF_COOKIE, csrf, samesite="lax", secure=COOKIE_SECURE, path="/",
@@ -47,7 +50,11 @@ def login(body: LoginIn, request: Request, response: Response) -> dict:
 
 @router.post("/logout", dependencies=[CsrfChecked])
 def logout(request: Request, response: Response) -> dict:
-    destroy_session(request.cookies.get(SESSION_COOKIE, ""))
+    sid = request.cookies.get(SESSION_COOKIE, "")
+    session = get_session(sid)
+    destroy_session(sid)
+    if session:
+        audit(str(session["uid"]), "LOGOUT", "")
     response.delete_cookie(SESSION_COOKIE, path="/")
     response.delete_cookie(CSRF_COOKIE, path="/")
     return {"status": "logged out"}

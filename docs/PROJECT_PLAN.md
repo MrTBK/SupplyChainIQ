@@ -1337,7 +1337,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: api/services/sources.py (MIME allowlist, 200k-row/100-col/20k-cell caps, sha256 duplicate detection, stage_upload guard), api/routes/sources.py (409 duplicates), tests/test_security_upload.py. Validation: 5 tests green (traversal + evil filename neutered, MIME/empty/garbage 422, shape caps, duplicate 409, never-served proof); suite 79 passed.
 
-- [ ] H7 audit expansion (LOGIN/FAILED/LOGOUT/ETL/upload events)
+- [x] H7 audit expansion (LOGIN/FAILED/LOGOUT/ETL/upload events)
+
+  Completed: 2026-09-14. Files: api/routes/auth.py (LOGIN/LOGIN_FAILED/LOGOUT), api/routes/etl_runs.py (STARTED/COMPLETED/FAILED), api/routes/sources.py (UPLOAD_STAGED), api/routes/etl_runs.py (+missing CsrfChecked import found by suite), tests/test_security_audit.py, tests/test_api_rbac.py (audit schema in fixture). Validation: 2 audit tests green incl. no-secret scan of audit rows; suite 81 passed.
+
 - [ ] H8 observability (request IDs, structured log, readiness probe)
 - [ ] H9 frontend security/UX fixes (envelope parsing, 403/404, login states)
 - [ ] H10 secrets/config review
@@ -1414,6 +1417,10 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 ### 2026-09-14 (H6 upload hardening)
 - MIME allowlist, shape caps, duplicate 409s, traversal guards, staged-never-served proof.
 - Evidence: 5 upload-attack tests green; suite 79 passed.
+
+### 2026-09-14 (H7 audit expansion)
+- LOGIN/FAILED/LOGOUT + ETL STARTED/COMPLETED/FAILED + UPLOAD_STAGED; secret-free rows verified by test.
+- Evidence: 2 audit tests green; suite 81 passed.
 
 ## 6. ARCHITECTURE DECISIONS
 
