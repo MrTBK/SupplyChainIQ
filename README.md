@@ -13,6 +13,16 @@ Phase 0 — Discovery & Skills. See `docs/PROJECT_PLAN.md` section 2 for live st
 
 ## Quickstart (dev)
 
+One command (venv + install + SYNTHETIC demo + ETL + tests):
+
+```bash
+./run.sh            # quick demo (seed 7, 90 days)
+./run.sh --full     # full demo (seed 42, 2 years, slower)
+./run.sh --tests-only
+```
+
+Manual equivalent:
+
 ```bash
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt

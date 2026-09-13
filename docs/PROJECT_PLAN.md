@@ -1200,6 +1200,11 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 - Evidence: 19 pytest green pristine; demo marts verified (OTIF 0.224, OTD 0.447); demo_e2e.sh green.
 - All phases COMPLETE. Progress 100%.
 
+### 2026-09-13 (run.sh runner)
+- Added ./run.sh (--quick/--full/--tests-only): venv + install + generate + ETL + marts + pytest in one command. Verified: --tests-only 19 passed, --quick end-to-end green.
+- Known: business keys are not seed-namespaced, so loading seed-7 into a DB already holding seed-42 is absorbed by idempotency (overlapping keys ignored by design). Use a fresh DB file per seed for isolated demos.
+- README quickstart updated.
+
 ## 6. ARCHITECTURE DECISIONS
 
 ### ADR-001 — PostgreSQL as Warehouse (APPROVED)
