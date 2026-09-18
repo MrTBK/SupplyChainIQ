@@ -29,3 +29,6 @@ def test_overview_values_and_rbac(tmp_path, monkeypatch):
         body = r.json()
         assert body["sales_lines"] == 1 and body["quarantined_rows"] >= 2
         assert set(body) >= {"revenue", "inventory_value", "procurement_otif", "delivery_otd"}
+        p = body["period"]
+        assert set(p) >= {"start", "end", "snapshot", "last_etl_at", "last_etl_status"}
+        assert p["start"] <= p["snapshot"] and p["end"] == p["snapshot"]

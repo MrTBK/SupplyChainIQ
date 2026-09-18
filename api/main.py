@@ -36,6 +36,8 @@ from .routes.suppliers import router as suppliers_router
 def create_app() -> FastAPI:
     seed_admin()
     init_alerts_schema()
+    from .recs import init_rec_schema
+    init_rec_schema()
     from .sessions import init_sessions_schema
     init_sessions_schema()
     from .users import init_admin_schema

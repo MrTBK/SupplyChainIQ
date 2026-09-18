@@ -20,6 +20,11 @@ data/*.sqlite*
 *.db
 !data/**/.gitkeep
 
+# DataCo source CSVs are large public downloads - fetch from Mendeley, do not commit
+# https://data.mendeley.com/datasets/8gx2fvg2k6/5 -> DataCo/DataCoSupplyChainDataset.csv
+DataCo/*.csv
+!DataCo/DescriptionDataCoSupplyChain.csv
+
 # Power BI temp
 ~$*.pbix
 *.tmp

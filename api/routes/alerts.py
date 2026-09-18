@@ -6,10 +6,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from ..alerts import list_alerts, set_status, store_evaluation
+from .. import users as ustore
 from ..db import warehouse_ro
 from ..foundation import parse_paging
 from ..csrf import CsrfChecked
-from ..rbac import require_perm
+from ..rbac import current_user, require_perm
 from ..services.risks import evaluate
 
 router = APIRouter(prefix="/api/alerts", tags=["alerts"])
@@ -38,11 +39,14 @@ class AckIn(BaseModel):
 
 
 @router.patch("/{alert_id}", dependencies=[Depends(require_perm("ops:read")), CsrfChecked])
-def patch_alert(alert_id: int, body: AckIn) -> dict:
+def patch_alert(alert_id: int, body: AckIn, actor: dict = Depends(current_user)) -> dict:
     try:
-        ok = set_status(alert_id, body.status)
+        name = next((u["username"] for u in ustore.list_users() if u["id"] == actor["uid"]),
+                    str(actor["uid"]))
+        ok = set_status(alert_id, body.status, name)
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
     if not ok:
         raise HTTPException(status_code=404, detail="Alert not found")
+    ustore.audit(str(actor["uid"]), f"alert.{body.status}", str(alert_id))
     return {"id": alert_id, "status": body.status}

@@ -37,3 +37,18 @@ def test_logistics_summary_and_late(tmp_path, monkeypatch):
             assert late["items"][0]["delay_days"] > 0
     finally:
         c.__exit__()
+
+
+def test_late_filters_carrier_region(tmp_path, monkeypatch):
+    c = _client(tmp_path, monkeypatch)
+    try:
+        s = c.get("/api/logistics/summary").json()
+        cid = s["by_carrier"][0]["carrier_id"]
+        f = c.get("/api/logistics/late", params={"carrier": cid}).json()
+        assert all(i["carrier_id"] == cid for i in f["items"])
+        assert f["total"] <= s["late_count"]
+        r0 = s["by_region"][0]["region"]
+        g = c.get("/api/logistics/late", params={"region": r0}).json()
+        assert all(i["region"] == r0 for i in g["items"])
+    finally:
+        c.__exit__()

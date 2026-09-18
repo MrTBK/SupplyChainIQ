@@ -17,39 +17,48 @@
 ## 2. Current Status
 
 ```text
-Current Phase: Phase 22 — Frontend Design & UX (F1 done, F2 next)
-Current Milestone: Token foundation live, shell next
-Overall Progress: 97%
+Current Phase: Phase 23 — DataCo Real-Data Migration (COMPLETE)
+Current Milestone: DataCo cutover done, acceptance next
+Overall Progress: 100% + DataCo migration
 
 Completed:
-✓ Phases 0-20 all COMPLETE incl. Phase 14 web app
-✓ Phase 21 H1-H14 COMPLETE with regression tests per fix
-✓ Phase 22 F1 token foundation + ADR-010
+✓ Phases 0-22 all COMPLETE (synthetic baseline)
+✓ DataCo migration COMPLETE 2026-09-18: profile (180,519 rows, 2015-01-01–2018-01-31),
+  mapping/lineage docs, ingestion (ingestion/dataco_adapter.py + etl/load_dataco.py,
+  idempotent, score 1.0, 0 quarantined), warehouse (011_dataco.sql, fact_sales/
+  shipments/deliveries + status/mode, stg_dataco), backend repoint (overview/
+  logistics/risks/recommendations/sources), frontend (DataCo banner, hidden
+  /inventory + /suppliers, mode-based logistics), PowerBI measures, 130 tests green
+  (127 existing + 3 dataco pipeline), frontend dist rebuilt
 
 In Progress:
-→ F2 app shell
+→ None (awaiting acceptance)
 
 Next:
-□ F3 component library → F4 login → F5/F6 page redesigns → F7/F8 QA
+□ Acceptance (push/tag)
 
 Blockers:
 None
 
 Last Updated:
-2026-09-14
+2026-09-18
 
 Last Completed Task:
-F1 design tokens + CSS foundation (build + 8 tests green)
+Logistics date integrity (P0): promised=order+sched / delivered=ship_date verified
+on raw rows, backfilled 180,519 deliveries with 0 mismatches, 25 displayed rows
+traced to raw CSV in tests/test_delivery_date_consistency.py; header now
+Dataset/Analysis-cutoff/Ingested; fraud wording removed; audit seed rows purged
+(verified 0 remain); 130+ tests green with browser screenshot evidence
 
 Next Concrete Task:
-F2 app shell (see Section 14 Next Action)
+Acceptance (push/tag)
 ```
 
 | Metric | Value |
 |---|---|
-| Current phase | Phase 22 — Frontend Design & UX (F1 done) |
-| Current milestone | Token foundation live, shell next |
-| Overall progress | 97% (F1 of F8 with evidence) |
+| Current phase | Phase 22 — Frontend Design & UX (COMPLETE) |
+| Current milestone | Phase 22 done, acceptance next |
+| Overall progress | 100% (F1-F8 with evidence) |
 | Completed phases | Phases 0-21 COMPLETE 2026-09-14 |
 | Active phase | None (awaiting acceptance) |
 | Next phase | Acceptance (push/tag) + optional hardening follow-ups |
@@ -1438,8 +1447,55 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 
   Completed: 2026-09-14. Files: frontend api.js (patch/upload/remove helpers), hooks.jsx (reload), pages.jsx (upload form + toasts, trigger modal + run detail, ack buttons, user create/delete modals), scripts/web_e2e.py (DELETE + header/error proxy fixes). Validation: browser-verified trigger toast + run history, ack toast, create modal + DB-proof delete; upload form renders (file-pick not drivable by harness; endpoint fully API-tested). Visual QA fixed 2 real issues: missing Input import (new JSX-resolve test) and chart projection misalignment. Demo state restored (test user removed, 266 test alerts acked).
 
-- [ ] F7 responsive + a11y QA
-- [ ] F8 visual + functional regression + docs
+- [x] F7 responsive + a11y QA
+
+  Completed: 2026-09-14. Files: frontend/src/theme.css (--danger #dc2626 → #b91c1c for badge contrast), frontend/src/tokens.js (mirror parity), reports/f7-*.png (9 browser screenshots). QA: widths 1440/1280/1024/768/390 all render without page overflow (390 inventory table scrolls inside wrap); drawer nav ≤900px verified; keyboard Tab reaches nav/bell/menu with :focus-visible styling; contrast pairs measured primary 17.06 / muted 4.55 / white-on-primary 8.72 / success 4.57 / amber 4.51 / danger 3.95 → 5.30 after fix / white-on-danger 6.47; reduced-motion media query present per theme.css. Validation: `npm run build` green; 14 frontend gate tests green; full suite 99 passed.
+- [x] F8 visual + functional regression + docs
+
+  Completed: 2026-09-14. Files: none changed (no regressions found); reports/f8-*-1440.png (8 route screenshots: suppliers, logistics, forecasts, risks, recommendations, sources, etl, admin; plus F7 set covers overview, inventory, quality, alerts). QA: all 12 routes render with zero page overflow, consistent navy shell + KPI + Card + DataTable language, real API data throughout, RBAC admin gate intact. Validation: `npm run build` green; full suite 99 passed. Phase 22 COMPLETE, §42 met.
+
+### Phase 23 — Productization & Real-World UX (presentation layer)
+- [x] P1 shared formatting layer + chart/role polish
+
+  Completed: 2026-09-14. Files: frontend/src/lib/format.js (formatPercent/Number/Compact/Currency/Date/DateTime/Status/RiskType/Entity/Role/Coverage/targetDelta — backend values untouched), frontend/src/charts.jsx (default title 'Series', fixes `undefined: line chart` aria), frontend/src/components.jsx (severityTone/statusTone, KpiCard delta + humanized tone labels), frontend/src/Shell.jsx (DEMO DATA badge with synthetic-dataset tooltip), tests/test_frontend_format.py (4 gates). Validation: 13 frontend tests green; `npm run build` green (46 modules).
+
+- [x] P2 all 12 pages humanized on real API data only
+
+  Completed: 2026-09-14. Files: frontend/src/pages.jsx (Overview KPIs 25.6%/45.5% + pts-vs-target deltas + Healthy DQ card; Inventory currency/coverage + warehouse/low filters; Suppliers search + Health·% + OTIF% + spend/receipts; Logistics OTD% + carrier/region cuts + promised/delivered dates; Forecasts warehouse filter + titled charts + WAPE% + avg demand; Risk center severity/type/search filters + counts + detail Modal with coverage/OTIF/OTD/anomaly metrics; Recommendations product/kind filters + HIGH PRIORITY + qty; Sources connected/failed/never-run KPIs + humanized table + time; ETL source filter + duration/dates/numbers formatted + detail Modal; Quality % scores + gate + quarantine time; Alerts status filter + open counts + entity/time formatted + ack; Admin role/status/date formatting + audit humanized time/action). No fake metrics, no backend changes. Validation: browser walk 11/11 routes ok; snapshots confirm $2.14M/25.6%/P0001·W1/Stockout risk·HIGH/`P0001 demand forecast: line chart`; full suite 103 passed.
+
+### Phase 24 — Complete Productization (data realism + workflows)
+- [x] A1 verify uncommitted P1-P2 tree
+
+  Completed: 2026-09-14. Files: none changed. Validation: 18 frontend tests green; `npm run build` green.
+
+- [x] A2 scenario clock + freshness
+
+  Completed: 2026-09-14. Files: data_generator/generate.py (SCENARIO_END 2026-09-13 end-anchor, --start/--end CLI, manifest start+end), api/services/overview.py (period start/end/snapshot/last ETL), frontend/src/Shell.jsx (Freshness in breadcrumb on every page), tests/test_generator.py (end-anchor + back-compat), tests/test_api_overview.py (period keys + ordering). Dev data regenerated seed-42 730d: period 2024-09-14–2026-09-13, snapshot 2026-09-13. Validation: full suite 104 passed; build green.
+
+- [x] B data realism tiers + names
+
+  Completed: 2026-09-14. Files: data_generator/generate.py (SUPPLIER_TIERS A/B/C with matching late-day ranges, CARRIER_PROFILES CR1 problematic/CR2 occasional, WAREHOUSE_DEMAND per-site scale, human product/supplier/carrier names, W1 overstock bias kept), tests/test_generator.py (tier lateness ordering + name uniqueness). Dev data regenerated: OTIF 0.178 / OTD 0.458 (tier-driven, coherent). Validation: full suite 105 passed.
+
+- [x] C integrity + on-hand floor
+
+  Completed: 2026-09-14. Files: data_generator/generate.py (on-hand floored at 0 with backlog-traceability comment; reserved capped to on-hand — test caught reserved 24 > on-hand 18, fixed at source), etl/load.py (R02 quarantines negative/reserved-exceeds snapshots for production data), tests/test_data_integrity.py (orphans, date order + period bounds, non-negative domains on seed-7). Dev data regenerated: min available 0, zero reserved>on-hand, zero negatives. Validation: full suite 108 passed.
+
+- [x] D entity relationships + detail views
+  Completed: 2026-09-14. Files: api/services/linkage.py (stable RSK-/REC- IDs + bidirectional risk↔rec matching incl. transfer-deficit and supplier indexing), api/routes/risks.py + recommendations.py (both sides carry id/rec_ids/risk_ids), api/services/logistics.py + routes (carrier/region filters on /late + region in rows), api/services/suppliers.py (recent_receipts in detail), frontend/src/pages.jsx (URL-synced filters on Risks/Recommendations/Forecasts, RiskDetail with Review-action links, rec Caused-by links, enriched ProductDrill with sparkline/forecast/cross-links, SupplierDetail modal with spend chart + receipts + risk link, Logistics carrier/region filters), tests/test_risk_rec_links.py + supplier/logistics additions. Validation: targeted 8 passed; build green; frontend gates 18 green.
+
+  Data audit found 3 HIGH reorders with no risk (discontinued products: lifetime-average demand vs no recent sales). Fixed at source: recommend() skips positions with no sale in trailing 90d + preferred-supplier limited to live-demand products; RiskDetail gained per-kind Investigate links (supplier→suppliers, carrier→logistics, anomaly/stockout→forecasts) with URL-synced supplier/logistics filters. Dev result: 0 unlinked HIGH reorders, recs 498→478. Validation: consistency +9 passed.
+
+- [x] E1 rec lifecycle + alert attribution
+
+  Completed: 2026-09-14. Files: api/recs.py (rec_status store, 6 states, audited transitions, wellformed-ID guard), api/routes/recommendations.py (rec_status/rec_actor/rec_updated_at attached, ?rec_status= filter, PATCH review flow), api/main.py (schema init), api/alerts.py + routes (acknowledged_by/at migration + actor + audit), frontend/src/pages.jsx (State column + Review/Approve/Reject/Execute buttons + state filter; alert By/At columns), frontend/src/components.jsx (lifecycle tones), tests/test_rec_lifecycle.py. Validation: 4 passed; build green.
+
+- [x] E2 consistency + realism + scenario tests
+
+  Completed: 2026-09-14. Files: tests/test_business_consistency.py (OTIF/OTD/coverage definitions match engine, HIGH reorders link risks, forecast shape), tests/test_data_realism.py (score bands ≥3, carrier/warehouse spread, date spread, DQ-score↔quarantine agreement on seed-7), tests/test_business_scenarios.py (S1 supplier→rec, S2 stockout→reorder, S3 carrier→late-list, S4 upload→ETL→overview). Validation: 12 passed.
+
+- [x] E3 docs + audits + visual walk
+
+  Completed: 2026-09-14. Files: docs/PROJECT_PLAN.md (Phase 24 tracker, BI demo numbers 0.178/0.458, counts). Audits: security grep clean (localStorage only sidebar pref, CORS exact-origin, f-string SQL all parameterized/allowlisted, no JWT/debug/secret-logging); placeholder grep clean (only legit input placeholders + guarded JS undefined); data audit on seed-42 (0 orphans, 0 date inversions, 0 negatives, period 2024-09-14–2026-09-13, 366 risks/478 recs, 0 unlinked HIGH reorders after staleness fix). Visual walk 12/12 routes clean (freshness crumb verified in DOM + screenshot, OTIF 17.8%/OTD 45.8%, LINKS/STATE/CAUSED-BY columns, URL filters). Validation: build green; full suite 127 passed.
 
 ## Change Log
 
@@ -1536,6 +1592,14 @@ A task is complete only when acceptance criteria are satisfied and validated. No
 - theme.css semantic tokens + type/spacing/shape/motion scales; Fira progressive-enhancement fonts; focus + reduced-motion; ADR-010 (hand-rolled CSS/SVG, light-default).
 - Evidence: 3 token tests green; `npm run build` green. Phase 22 opened (F1/8).
 
+### 2026-09-14 (Phase 23 productization)
+- P1 format layer (lib/format.js) + chart undefined-title fix + severity/status tones + DEMO DATA badge + 4 format gates. P2 all 12 pages humanized: Overview 25.6%/45.5% + deltas, $2.14M/$9.27M compacts, P0001·W1 entities, Stockout risk labels, Sep 14 · 16:27 dates, risk detail Modal, all filters backend-supported. Zero backend changes, zero fake metrics.
+- Evidence: `npm run build` green (46 modules); 13 frontend tests green; full suite 103 passed; browser walk 11/11 ok with snapshots (Overview/Risks/Forecasts/Suppliers verified).
+
+### 2026-09-14 (Phase 24 complete productization)
+- A clock: SCENARIO_END 2026-09-13 end-anchor + manifest start/end, overview period, freshness crumb on every page. B realism: tiered suppliers/carriers/warehouses + human names. C integrity: on-hand floor, reserved cap, R02 snapshot guard, integrity tests (caught reserved>on-hand, fixed at source). D links: RSK-/REC- IDs + bidirectional matching, URL-synced filters, enriched drills, supplier modal, logistics filters. E1 lifecycle: 6-state rec statuses + alert ack-by/at, audited. E2/E3: 19 scenario/consistency/realism tests, audits clean, 12/12 visual walk.
+- Evidence: build green; full suite 127 passed; dev seed-42 period 2024-09-14–2026-09-13, OTIF 0.178/OTD 0.458, 366 risks/478 recs, 0 unlinked HIGH reorders.
+
 ## 6. ARCHITECTURE DECISIONS
 
 ### ADR-001 — PostgreSQL as Warehouse (APPROVED)
@@ -1623,16 +1687,18 @@ Update this log on every significant change. Never silently change architecture.
 | Phase 19 — Documentation | Complete | 100% |
 | Phase 20 — Final Validation & Demo | Complete | 100% |
 | Phase 21 — Production Hardening | Complete | 100% |
-| Phase 22 — Frontend Design & UX | In progress (F1 done) | 12% |
+| Phase 22 — Frontend Design & UX | Complete | 100% |
+| Phase 23 — Productization & Real-World UX | Complete | 100% |
+| Phase 24 — Complete Productization (data realism + workflows) | Complete | 100% |
 
 Overall: 97%. Based on completed tasks only, not estimation.
 
 ## 8. TEST STATUS
 
 * Tests planned: generator reproducibility, schema/constraints, grain uniqueness, SCD current-flag, FK enforcement, ETL idempotency, watermark advance, DQ quarantine + score gate, DAX vs SQL gold (22 KPIs), forecast leakage + baseline comparison, hand-calc prescription, NL allowlist/injection (if built), analyst read-only negative, fresh-clone E2E seed 7.
-* Tests implemented: 89 (platform 19 + web 41 + hardening 29: sessions 4, ratelimit 2, csrf 3, cors 3, headers 2, upload 5, audit 2, observability 3, config 4, ux-security 1 [test_ux.py now 5])
-* Tests passing: 89
-* Evidence: `.venv/bin/pytest -q` = 89 passed 2026-09-14, pristine output (2 third-party starlette warnings only).
+* Tests implemented: 127 (prior 108 + links 2 + supplier/logistics detail 2 + rec lifecycle 2 + consistency 6 + realism 3 + scenarios 4)
+* Tests passing: 127
+* Evidence: `.venv/bin/pytest -q` = 127 passed 2026-09-14, pristine output (2 third-party starlette warnings only).
 * Tests failing: 0
 * Known issues: supplier quality score uses returns proxy until lot traceability (documented in machine_learning.md); .pbix click-ops assembly remains manual in Power BI Desktop.
 * Coverage: generator, ETL/DQ, warehouse grains, KPIs, forecasting baselines, prescriptions, E2E.
@@ -1667,7 +1733,7 @@ Inventory Intelligence
 
 Procurement & Supplier Performance
 [x] OTIF / lead-time variance / spend / price change
-[x] UX validation (demo OTIF 0.224 shows degradation story)
+[x] UX validation (demo OTIF 0.178 tier-driven degradation story, seed-42 2024-09-14–2026-09-13)
 
 Demand Analytics
 [x] Trend / seasonality / growth
@@ -1675,7 +1741,7 @@ Demand Analytics
 
 Logistics & Delivery
 [x] OTIF by carrier/lane / p50+p90 / delay causes
-[x] UX validation (demo OTD 0.447)
+[x] UX validation (demo OTD 0.458)
 
 Risk & Alerts
 [x] Stockout risk list / degradation flags (prescriptions carry risk)
@@ -1720,19 +1786,19 @@ Process: for every blocker record problem, impact, cause, possible solutions, cu
 
 The next concrete task is:
 
-> F2 app shell: topbar + grouped sidebar + role-aware nav + responsive structure.
+> Acceptance: push/tag. Phases 22–24 COMPLETE, §42 + full definition of done met.
 
 Reason:
 
-> Tokens exist but no page consumes them yet. The shell gives every later task its layout, navigation, and identity frame.
+> F1-F8 + P1-P2 + A–E all [x] with browser evidence + green builds (127 tests).
 
 Prerequisites:
 
-> F1 done. No page redesigns in this task.
+> None. No code changes pending.
 
 Expected result:
 
-> Shell renders on all routes with active states and role-aware items; build green; screenshot evidence.
+> Tagged release with all 103 tests green.
 ```
 
 ---

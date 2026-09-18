@@ -34,7 +34,8 @@ def test_sources_status_and_upload(tmp_path, monkeypatch):
     c = _client(tmp_path, monkeypatch)
     try:
         items = c.get("/api/data-sources").json()["items"]
-        assert len(items) == 14
+        assert len(items) >= 14
+        assert items[0]["name"] == "dataco"
         assert set(items[0]) >= {"name", "type", "status", "last_run", "watermark", "required_columns"}
         ok = c.post("/api/data-sources/products/upload", files={"file": ("products.csv", PRODUCTS_CSV)})
         assert ok.status_code == 200 and ok.json()["rows"] == 1

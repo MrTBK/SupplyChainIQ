@@ -22,10 +22,12 @@ def get_summary() -> dict:
 
 
 @router.get("/late", dependencies=[Depends(require_perm("ops:read"))])
-def get_late(limit: int = 50, offset: int = 0) -> dict:
+def get_late(limit: int = 50, offset: int = 0, carrier: str = "", region: str = "",
+             mode: str = "") -> dict:
     pg = parse_paging(limit, offset)
     con = warehouse_ro()
     try:
-        return late_deliveries(con, limit=pg["limit"], offset=pg["offset"])
+        return late_deliveries(con, limit=pg["limit"], offset=pg["offset"],
+                               carrier=carrier, region=region, mode=mode or carrier)
     finally:
         con.close()

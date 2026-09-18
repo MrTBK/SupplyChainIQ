@@ -18,7 +18,7 @@ def connect(db_path: Path) -> sqlite3.Connection:
 
 
 def init_schema(con: sqlite3.Connection) -> None:
-    for name in ["001_dims.sql", "002_facts.sql", "003_constraints.sql", "005_infra.sql"]:
+    for name in ["001_dims.sql", "002_facts.sql", "003_constraints.sql", "005_infra.sql", "011_dataco.sql"]:
         con.executescript((SQL_DIR / name).read_text())
     # unknown members
     con.execute("INSERT OR IGNORE INTO dim_product VALUES (0,'UNKNOWN','UNKNOWN','Unknown','Unknown',0,'1900-01-01',NULL,1)")

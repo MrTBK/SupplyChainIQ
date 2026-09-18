@@ -24,6 +24,11 @@ def init_alerts_schema() -> None:
         action TEXT NOT NULL DEFAULT '',
         status TEXT NOT NULL DEFAULT 'open',
         dedupe_key TEXT NOT NULL UNIQUE)""")
+    cols = {r[1] for r in con.execute("PRAGMA table_info(alerts)")}
+    if "acknowledged_by" not in cols:
+        con.execute("ALTER TABLE alerts ADD COLUMN acknowledged_by TEXT NOT NULL DEFAULT ''")
+    if "acknowledged_at" not in cols:
+        con.execute("ALTER TABLE alerts ADD COLUMN acknowledged_at TEXT NOT NULL DEFAULT ''")
     con.commit()
     con.close()
 
@@ -59,7 +64,7 @@ def list_alerts(status: str = "", severity: str = "", kind: str = "",
     total = con.execute(f"SELECT COUNT(*) FROM alerts {where}", params).fetchone()[0]
     rows = con.execute(
         f"""SELECT id, detected_at, kind, severity, entity_type, entity_id, reason,
-            metrics_json, action, status FROM alerts {where}
+            metrics_json, action, status, acknowledged_by, acknowledged_at FROM alerts {where}
             ORDER BY detected_at DESC, id DESC LIMIT ? OFFSET ?""",
         (*params, limit, offset)).fetchall()
     con.close()
@@ -71,11 +76,17 @@ def list_alerts(status: str = "", severity: str = "", kind: str = "",
     return {"total": total, "items": items}
 
 
-def set_status(alert_id: int, status: str) -> bool:
+def set_status(alert_id: int, status: str, by: str = "") -> bool:
     if status not in STATUSES:
         raise ValueError(f"status must be one of {STATUSES}")
+    from datetime import datetime, timezone
     con = app_db()
-    cur = con.execute("UPDATE alerts SET status=? WHERE id=?", (status, alert_id))
+    if status == "open":
+        cur = con.execute("UPDATE alerts SET status=?, acknowledged_by='', acknowledged_at='' WHERE id=?",
+                          (status, alert_id))
+    else:
+        cur = con.execute("UPDATE alerts SET status=?, acknowledged_by=?, acknowledged_at=? WHERE id=?",
+                          (status, by, datetime.now(timezone.utc).isoformat(), alert_id))
     con.commit()
     con.close()
     return cur.rowcount == 1

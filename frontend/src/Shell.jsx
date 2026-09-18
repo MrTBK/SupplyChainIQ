@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import Icon, { BrandMark } from './icons.jsx'
 import { useApi } from './hooks.jsx'
+import { formatDate, formatTimeShort } from './lib/format.js'
 import './shell.css'
 
 const GROUPS = [
@@ -12,8 +13,6 @@ const GROUPS = [
   {
     label: 'Operations',
     items: [
-      { to: '/inventory', label: 'Inventory', icon: 'box' },
-      { to: '/suppliers', label: 'Suppliers', icon: 'users' },
       { to: '/logistics', label: 'Logistics', icon: 'truck' },
       { to: '/forecasts', label: 'Forecasts', icon: 'chart' },
     ],
@@ -43,8 +42,6 @@ const GROUPS = [
 
 const TITLES = {
   '/': 'Overview',
-  '/inventory': 'Inventory',
-  '/suppliers': 'Suppliers',
   '/logistics': 'Logistics',
   '/forecasts': 'Forecasts',
   '/risks': 'Risks',
@@ -64,6 +61,24 @@ function AlertsBell() {
       <Icon name="bell" size={19} />
       {count > 0 && <span className="sci-bell-count">{count > 99 ? '99+' : count}</span>}
     </Link>
+  )
+}
+
+function Freshness() {
+  const { data } = useApi('/api/kpis/overview')
+  const p = data && data.period
+  const src = data && data.source
+  if (!p || !p.snapshot) return null
+  return (
+    <span>
+      {' '}· Dataset {p.start ? `${formatDate(p.start)} – ${formatDate(p.end)}` : formatDate(p.snapshot)}
+      {' '}· Analysis cutoff {formatDate(p.snapshot)}
+      {src && src.last_processed && (
+        <span title={`System metadata: pipeline ran ${formatTimeShort(src.last_processed)} (${src.status}) — not business data`}>
+          {' '}· Ingested {formatTimeShort(src.last_processed)}
+        </span>
+      )}
+    </span>
   )
 }
 
@@ -109,7 +124,7 @@ export default function Shell({ user, onLogout, children }) {
         <Link to="/" className="sci-brand">
           <BrandMark /> SupplyChainIQ
         </Link>
-        <span className="sci-env-badge">Synthetic demo</span>
+        <span className="sci-env-badge" title="Historical public dataset — DataCo Smart Supply Chain (2015–2018), not a private company">DataCo · historical</span>
         <span className="sci-topbar-spacer" />
         <AlertsBell />
         <UserMenu user={user} onLogout={onLogout} />
@@ -144,7 +159,7 @@ export default function Shell({ user, onLogout, children }) {
         <button type="button" className="sci-scrim" aria-label="Close navigation" onClick={() => setDrawer(false)} />
         <main className="sci-main">
           <div className="sci-main-inner">
-            <div className="sci-crumb" aria-hidden="true">SupplyChainIQ / {title}</div>
+            <div className="sci-crumb" aria-hidden="true">SupplyChainIQ / {title}<Freshness /></div>
             {children}
           </div>
         </main>

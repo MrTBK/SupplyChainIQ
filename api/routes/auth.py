@@ -41,7 +41,7 @@ def login(body: LoginIn, request: Request, response: Response) -> dict:
         audit(body.username.strip()[:64], "LOGIN_FAILED", "invalid credentials")
         raise HTTPException(status_code=401, detail="Invalid username or password")
     clear_login(key)
-    audit(user["username"], "LOGIN", f"id={user['id']}")
+    audit(user["username"], "LOGIN", f"Signed in as {user['role']}")
     sid, csrf = create_session(user["id"])
     _set_session_cookie(response, sid)
     response.set_cookie(CSRF_COOKIE, csrf, samesite="lax", secure=COOKIE_SECURE, path="/",

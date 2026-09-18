@@ -38,3 +38,15 @@ def test_supplier_ranking_and_detail(tmp_path, monkeypatch):
         assert c.get("/api/suppliers/NOPE").status_code == 404
     finally:
         c.__exit__()
+
+
+def test_supplier_detail_receipts(tmp_path, monkeypatch):
+    c = _client(tmp_path, monkeypatch)
+    try:
+        item = c.get("/api/suppliers").json()["items"][0]
+        d = c.get(f"/api/suppliers/{item['supplier_id']}").json()
+        assert isinstance(d["recent_receipts"], list) and d["recent_receipts"]
+        r0 = d["recent_receipts"][0]
+        assert set(r0) >= {"po_id", "product_id", "ordered_qty", "received_qty", "late_days", "receipt_date"}
+    finally:
+        c.__exit__()

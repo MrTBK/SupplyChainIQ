@@ -37,6 +37,6 @@ def test_dq_score_quarantine_rules(tmp_path, monkeypatch):
         assert set(q["items"][0]) >= {"rule_id", "reason", "payload", "business_key"}
         assert c.get("/api/data-quality/quarantine", params={"rule": "R02"}).json()["total"] >= 1
         rules = c.get("/api/data-quality/rules").json()
-        assert rules["total"] == 8 and {r["id"] for r in rules["items"]} >= {"R01", "R08"}
+        assert rules["total"] >= 8 and {r["id"] for r in rules["items"]} >= {"R01", "R08"}
     finally:
         c.__exit__()

@@ -5,13 +5,36 @@ from __future__ import annotations
 import sqlite3
 from collections import defaultdict
 
+# Analysis window: DataCo volume collapses 80% from Oct 2017 (different
+# collection regime, every line qty=1). Analytics use months through Sep 2017;
+# the full raw range stays in the warehouse. See docs/data/dataco_profile.md.
+ANALYSIS_END = "2017-09-30"
 
-def monthly_series(con: sqlite3.Connection) -> dict[tuple[int, int], list[tuple[str, float]]]:
-    q = con.execute(
-        "SELECT product_sk, warehouse_sk, substr(date_key,1,7) m, SUM(qty) FROM fact_sales GROUP BY 1,2,3 ORDER BY 3")
-    out: dict[tuple[int, int], list[tuple[str, float]]] = defaultdict(list)
-    for ps, wh, m, qty in q:
-        out[(ps, wh)].append((m, float(qty)))
+
+def monthly_series(con: sqlite3.Connection, end: str | None = None,
+                   by_product: bool = False) -> dict:
+    """(product_sk, warehouse_sk) -> [(month, qty)] by default (legacy).
+
+    by_product=True aggregates across warehouses (DataCo has no warehouses).
+    end= caps months at YYYY-MM-DD (inclusive) to exclude the sparse tail.
+    """
+    q = "SELECT product_sk, warehouse_sk, substr(date_key,1,7) m, SUM(qty) FROM fact_sales"
+    params: list = []
+    if end:
+        q += " WHERE date_key <= ?"
+        params.append(end)
+    q += " GROUP BY 1,2,3 ORDER BY 3"
+    out: dict = defaultdict(list)
+    for ps, wh, m, qty in con.execute(q, params):
+        out[(ps, wh) if not by_product else (ps, 0)].append((m, float(qty)))
+    if by_product:
+        merged: dict = defaultdict(list)
+        for (ps, _), series in out.items():
+            by_m: dict[str, float] = {}
+            for m, qty in series:
+                by_m[m] = by_m.get(m, 0.0) + qty
+            merged[(ps, 0)] = sorted(by_m.items())
+        return merged
     return out
 
 

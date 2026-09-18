@@ -43,7 +43,14 @@ def supplier_detail(con: sqlite3.Connection, supplier_id: str) -> dict | None:
     trend = con.execute(
         "SELECT substr(receipt_date_key,1,7) m, SUM(received_qty*unit_cost), SUM(received_qty) "
         "FROM fact_purchases WHERE supplier_sk=? GROUP BY 1 ORDER BY 1 DESC LIMIT 12", (s["supplier_sk"],)).fetchall()
+    recent = con.execute(
+        """SELECT f.po_id, p.product_id, f.ordered_qty, f.received_qty, f.late_days, f.receipt_date_key
+        FROM fact_purchases f JOIN dim_product p ON p.product_sk=f.product_sk
+        WHERE f.supplier_sk=? ORDER BY f.receipt_date_key DESC LIMIT 10""", (s["supplier_sk"],)).fetchall()
     return {"supplier_id": supplier_id, "name": s["name"], "rating_tier": s["rating_tier"],
             "score": supplier_score(con, s["supplier_sk"]),
             "lead_time": lead_time_stats(con, s["supplier_sk"]),
-            "monthly_spend": [{"month": r[0], "spend": round(r[1], 2), "qty": r[2]} for r in trend]}
+            "monthly_spend": [{"month": r[0], "spend": round(r[1], 2), "qty": r[2]} for r in trend],
+            "recent_receipts": [{"po_id": r[0], "product_id": r[1], "ordered_qty": r[2],
+                                 "received_qty": r[3], "late_days": r[4],
+                                 "receipt_date": r[5]} for r in recent]}

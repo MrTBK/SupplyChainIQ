@@ -7,6 +7,14 @@
 # R06 completeness: promised_date present for OTIF scope.
 # R07 uniqueness: business-key UNIQUE enforced (so line, po line, shipment, return, movement).
 # R08 timeliness: batch freshness < 26h (checked by scheduler, stored in watermark).
+# DataCo R09-R15 (real validation, no injected errors):
+# R09 file contract: 53 columns, required headers present.
+# R10 validity: ship days in range 0-10, qty > 0, prices >= 0.
+# R11 consistency: order/shipping timestamps parse %m/%d/%Y %H:%M, epoch >= 2015-01-01.
+# R12 validity: Order Status in 9-value allowlist; Delivery Status in 4-value allowlist.
+# R13 uniqueness: (Order Id, Order Item Id) unique.
+# R14 completeness: product/customer ids not null; PII (email/password) dropped, never stored.
+# R15 consistency: delay_days = real - sched; on_time = (delay <= 0).
 DQ_THRESHOLD: 0.98
 rules:
   - {id: R01, dimension: completeness, severity: high}
@@ -17,3 +25,10 @@ rules:
   - {id: R06, dimension: completeness, severity: medium}
   - {id: R07, dimension: uniqueness, severity: medium}
   - {id: R08, dimension: timeliness, severity: medium}
+  - {id: R09, dimension: completeness, severity: high}
+  - {id: R10, dimension: validity, severity: high}
+  - {id: R11, dimension: consistency, severity: high}
+  - {id: R12, dimension: validity, severity: high}
+  - {id: R13, dimension: uniqueness, severity: medium}
+  - {id: R14, dimension: completeness, severity: high}
+  - {id: R15, dimension: consistency, severity: medium}

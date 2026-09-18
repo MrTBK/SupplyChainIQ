@@ -1,4 +1,4 @@
-"""Static browser-readable demo report from the warehouse (SYNTHETIC data).
+"""Static browser-readable report from the warehouse (DataCo historical data).
 
 Generates reports/demo.html. No dependencies, no server code, no app.
 Run: .venv/bin/python scripts/make_report.py [--db data/warehouse.db --out reports/demo.html]
@@ -41,7 +41,7 @@ def build(db_path: Path) -> str:
     return f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SupplyChainIQ — Demo Report (SYNTHETIC)</title>
+<title>SupplyChainIQ — Report (DataCo historical)</title>
 <style>
 body{{font-family:system-ui,sans-serif;max-width:960px;margin:2rem auto;padding:0 1rem;color:#1a1a1a}}
 .banner{{background:#fff3cd;border:1px solid #e6c200;padding:.75rem 1rem;border-radius:8px}}
@@ -53,7 +53,7 @@ th,td{{border:1px solid #ddd;padding:.4rem .6rem;text-align:left;font-size:.9rem
 th{{background:#f4f4f4}}
 h2{{margin-top:2rem;border-bottom:2px solid #222;padding-bottom:.25rem}}
 </style></head><body>
-<div class="banner"><b>SYNTHETIC demo data only.</b> Never present these numbers as real company figures. Source: warehouse marts.</div>
+<div class="banner"><b>DataCo historical public data (2015–2018).</b> Not a private company. Source: warehouse marts.</div>
 <h1>SupplyChainIQ — Decision Demo</h1>
 <h2>Executive snapshot</h2>
 <div class="grid">

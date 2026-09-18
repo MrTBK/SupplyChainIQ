@@ -1,11 +1,14 @@
-// Power BI DAX measures — mirror analytics/kpis.py (SQL gold). Import star via *_sk.
-Inventory Value = SUMX ( fact_inventory_snapshot, fact_inventory_snapshot[available] * fact_inventory_snapshot[unit_cost] )
-Coverage Proxy = DIVIDE ( SUM ( fact_inventory_snapshot[available] ), [Avg Daily Demand 30D] )
-Stockout Rate = DIVIDE ( [Stockout Days], [Active Days] )
-Turnover = DIVIDE ( [COGS], [Avg Inventory Value] )
-Supplier OTIF = DIVIDE ( CALCULATE ( COUNTROWS ( fact_purchases ), fact_purchases[late_days] <= 0 ), COUNTROWS ( fact_purchases ) )
-Avg Lead Time = AVERAGE ( fact_purchases[late_days] ) // plus order-to-receipt base in model; variance via STDEV.P
-On-Time Delivery = DIVIDE ( SUM ( fact_deliveries[on_time] ), COUNTROWS ( fact_deliveries ) )
-Avg Delivery Time = AVERAGE ( fact_deliveries[delay_days] )
+// Power BI DAX measures — DataCo warehouse (mirror analytics/kpis.py + api/services).
+// Grain: fact_sales/fact_shipments/fact_deliveries = one row per DataCo Order Item.
+// OTD truth EXCLUDES 'Shipping canceled' (see docs/data/dataco_mapping.md).
+// Inventory / supplier / purchase measures are RETIRED for DataCo (no source);
+// they remain in git history only. Hidden UI: /inventory, /suppliers.
+Revenue = SUM ( fact_sales[net_amount] )
+Orders = DISTINCTCOUNT ( fact_sales[so_id] )
+Units Sold = SUM ( fact_sales[qty] )
+Average Order Value = DIVIDE ( [Revenue], [Orders] )
+On-Time Delivery = DIVIDE ( CALCULATE ( SUM ( fact_deliveries[on_time] ), fact_deliveries[status] <> "Shipping canceled" ), CALCULATE ( COUNTROWS ( fact_deliveries ), fact_deliveries[status] <> "Shipping canceled" ) )
+Late Delivery Rate = DIVIDE ( CALCULATE ( COUNTROWS ( fact_deliveries ), fact_deliveries[status] = "Late delivery" ), CALCULATE ( COUNTROWS ( fact_deliveries ), fact_deliveries[status] <> "Shipping canceled" ) )
+Avg Shipping Delay = AVERAGE ( fact_deliveries[delay_days] )
 WAPE = DIVIDE ( SUMX ( forecast_compare, ABS ( forecast_compare[actual] - forecast_compare[forecast] ) ), SUM ( forecast_compare[actual] ) )
 Net Sales = SUMX ( fact_sales, fact_sales[qty] * fact_sales[unit_price] )

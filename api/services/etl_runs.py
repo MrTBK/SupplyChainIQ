@@ -39,6 +39,12 @@ def resolve_src(src: str, repo: Path) -> Path:
 
 
 def trigger(src: str, repo: Path, db_path: Path, batch: str = "") -> dict:
+    if src.strip().lower() == "dataco":
+        from etl.load_dataco import load as load_dataco
+        out = load_dataco(db_path, batch or ("dataco-" + datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")))
+        return {"run_id": out["run_id"], "quarantined": out["rejected"],
+                "duration_s": out["seconds"],
+                "stats": {"dataco": {"accepted": out["accepted"], "rejected": out["rejected"]}}}
     src_dir = resolve_src(src, repo)
     batch = batch or ("api-" + datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S"))
     out = load_batch(src_dir, db_path, batch)

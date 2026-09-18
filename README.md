@@ -4,8 +4,10 @@ Production-oriented BI/data engineering/analytics platform.
 
 Raw Data → Ingestion → Data Quality → ETL/ELT → Warehouse → Data Marts → BI → Forecasting → Anomaly Detection → Risk → Prescriptive Recommendations → Decision Support.
 
-> ALL DATA IN V1 IS SYNTHETIC. Never present generated data as real company data.
-> Single source of truth: `docs/PROJECT_PLAN.md`.
+> DATA SOURCE: DataCo Smart Supply Chain — historical PUBLIC dataset (2015-01-01–2018-01-31).
+> https://data.mendeley.com/datasets/8gx2fvg2k6/5 — not a private company.
+> Inventory / supplier / purchase-order intelligence is unavailable from this source and hidden.
+> Single source of truth: `docs/PROJECT_PLAN.md`. Lineage: `docs/data/lineage.md`.
 
 ## Status
 
@@ -13,18 +15,19 @@ Phase 0 — Discovery & Skills. See `docs/PROJECT_PLAN.md` section 2 for live st
 
 ## Quickstart (dev)
 
-One command (venv + install + SYNTHETIC demo + ETL + tests):
+One command (venv + install + DataCo load + tests):
 
 ```bash
-./run.sh            # quick demo (seed 7, 90 days)
-./run.sh --full     # full demo (seed 42, 2 years, slower)
+./run.sh            # quick tests (hermetic fixtures)
+./run.sh --full     # full suite incl. DataCo pipeline test (~2 min)
+./run.sh --dataco   # (re)load DataCo CSV into data/warehouse.db (idempotent)
 ./run.sh --tests-only
 ```
 
-Web app (Phase 14, operational layer around the BI platform):
+Web app (DataCo operational layer around the BI platform):
 
 ```bash
-./run.sh --web     # API + SPA at http://localhost:8766 (admin/change-me, SYNTHETIC demo)
+./run.sh --web     # API + SPA at http://localhost:8766 (admin/change-me, DataCo historical)
 ```
 
 Manual equivalent:

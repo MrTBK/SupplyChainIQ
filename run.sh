@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
-# run.sh — one-command runner for SupplyChainIQ (SYNTHETIC demo).
-# Usage: ./run.sh [--quick|--full|--tests-only|--web]
-#   --quick (default): venv + install + seed-7/90d generate + ETL load + pytest
-#   --full: seed-42/730d generate + ETL load + pytest (slower, ~1 min)
-#   --tests-only: pytest only (uses hermetic tmp fixtures, no data needed)
-#   --web: build frontend if needed, then serve API + SPA at http://localhost:8766
-#          (foreground — Ctrl+C to stop; sign in admin/change-me, SYNTHETIC demo)
+# run.sh — one-command runner for SupplyChainIQ (DataCo real data).
+# Usage: ./run.sh [--quick|--full|--tests-only|--web|--dataco]
+#   --quick (default): pytest only (hermetic tmp fixtures, no data needed)
+#   --full: pytest full suite incl. DataCo pipeline test (~2 min, reads 92MB CSV)
+#   --tests-only: pytest only
+#   --web: ensure DataCo warehouse loaded, build frontend if needed,
+#          then serve API + SPA at http://localhost:8766
+#   --dataco: (re)load DataCo CSV into data/warehouse.db (idempotent rerun = zero delta)
 set -euo pipefail
 
 MODE="${1:---quick}"
@@ -19,22 +20,10 @@ fi
 echo "[run] installing deps..."
 .venv/bin/pip install -q -r requirements.txt
 
-run_etl() {
-  local seed="$1" days="$2" batch="$3" src="$4" db="$5"
-  echo "[run] generating SYNTHETIC seed=$seed days=$days -> $src"
-  .venv/bin/python -m data_generator.generate --seed "$seed" --days "$days" --out "$src" | tail -1
-  echo "[run] loading warehouse $db (batch $batch)..."
-  .venv/bin/python -m etl.load --src "$src" --db "$db" --batch "$batch" | tail -4
-  echo "[run] applying marts + indexes..."
-  .venv/bin/python -c "
-import sqlite3
-c = sqlite3.connect('$db')
-c.executescript(open('warehouse/sql/008_marts.sql').read())
-c.executescript(open('warehouse/sql/010_indexes.sql').read())
-print('mart_demand rows:', c.execute('select count(*) from mart_demand').fetchone()[0])
-print('proc OTIF:', c.execute('select round(avg(case when late_days<=0 then 1.0 else 0 end),3) from mart_procurement').fetchone()[0])
-print('logistics OTD:', c.execute('select round(avg(cast(on_time as float)),3) from mart_logistics').fetchone()[0])
-"
+load_dataco() {
+  local batch="$1" db="$2"
+  echo "[run] loading DataCo into $db (batch $batch)..."
+  .venv/bin/python -m etl.load_dataco --db "$db" --batch "$batch" | tail -10
 }
 
 case "$MODE" in
@@ -52,22 +41,23 @@ case "$MODE" in
       (cd frontend && npm run build)
     fi
     if [ ! -f data/warehouse.db ]; then
-      echo "[run] no warehouse found — generating quick demo data first..."
-      run_etl 7 90 DEMO7 data/generated/seed-7 data/warehouse.db
+      echo "[run] no warehouse found — loading DataCo first..."
+      load_dataco DATACO1 data/warehouse.db
     fi
     echo "[run] starting web servers (foreground)..."
     exec .venv/bin/python scripts/serve_web.py
     ;;
+  --dataco)
+    load_dataco DATACO1 data/warehouse.db
+    ;;
   --full)
-    run_etl 42 730 DEMO42 data/generated/seed-42 data/warehouse.db
-    echo "[run] running tests..."
+    echo "[run] running tests (full, incl. DataCo pipeline)..."
     .venv/bin/pytest -q
     ;;
   --quick|*)
-    run_etl 7 90 DEMO7 data/generated/seed-7 data/warehouse.db
     echo "[run] running tests..."
-    .venv/bin/pytest -q
+    .venv/bin/pytest -q --ignore=tests/test_dataco_pipeline.py
     ;;
 esac
 
-echo "[run] OK. Data is SYNTHETIC. See docs/demo.md for the business walkthrough."
+echo "[run] OK. Data: DataCo Smart Supply Chain (historical public dataset 2015-2018)."

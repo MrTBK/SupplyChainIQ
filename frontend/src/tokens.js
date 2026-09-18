@@ -9,7 +9,7 @@ export const TOKENS = {
   accentMuted: '#fef3c7',
   success: '#15803d',
   warning: '#b45309',
-  danger: '#dc2626',
+  danger: '#b91c1c',
   info: '#1d4ed8',
   background: '#f8fafc',
   grid: '#dbe3ee',

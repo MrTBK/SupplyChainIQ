@@ -1,7 +1,7 @@
 """Serve the built SPA + live API behind one origin (foreground).
 
 Usage: .venv/bin/python scripts/serve_web.py [--web-port 8766 --api-port 8001]
-Open http://localhost:8766 and sign in (default admin/change-me, SYNTHETIC demo).
+Open http://localhost:8766 and sign in (default admin/change-me, DataCo historical).
 Ctrl+C stops both servers. Reuses the proxy Handler from web_e2e.py.
 """
 
@@ -35,7 +35,7 @@ def main() -> None:
     env.setdefault("SCI_ADMIN_USER", "admin")
     env.setdefault("SCI_ADMIN_PASSWORD", "change-me")
     if env.get("SCI_ADMIN_PASSWORD") == "change-me":
-        print("WARNING: default admin credentials in use (SYNTHETIC demo only).")
+        print("WARNING: default admin credentials in use (DataCo historical only).")
 
     # point the shared proxy Handler at our API port
     import web_e2e
@@ -47,7 +47,7 @@ def main() -> None:
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     try:
         wait(f"http://127.0.0.1:{a.api_port}/api/health")
-        print(f"SupplyChainIQ web live at http://localhost:{a.web_port}  (admin/change-me, SYNTHETIC demo)")
+        print(f"SupplyChainIQ web live at http://localhost:{a.web_port}  (admin/change-me, DataCo historical)")
         srv.serve_forever()  # foreground until Ctrl+C
     except KeyboardInterrupt:
         print("\nstopping...")

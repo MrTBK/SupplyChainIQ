@@ -1,4 +1,10 @@
-# KPI Catalog — SupplyChainIQ (SYNTHETIC definitions)
+# KPI Catalog — SupplyChainIQ (DataCo real-data definitions; synthetic § retired, see git history)
+
+> DataCo Smart Supply Chain (2015-01-01–2018-01-31). Grain: one row per Order Item.
+> OTD truth EXCLUDES 'Shipping canceled'. Late_delivery_risk is post-outcome (label only).
+> Inventory/supplier/purchase KPIs (#1-12, #20-22 above) are NOT available from DataCo;
+> rows kept for reference, hidden in UI. Live definitions: api/services/overview.py,
+> logistics.py, forecasts.py. Lineage: docs/data/lineage.md.
 
 Grain, formula, and limits per KPI. SQL gold: analytics/kpis.py. DAX mirrors in powerbi/measures.dax.
 

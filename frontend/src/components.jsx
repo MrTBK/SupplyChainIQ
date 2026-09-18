@@ -29,10 +29,28 @@ export function Select({ label, help, children, id, ...props }) {
 }
 
 const TONE_WORDS = {
-  success: ['healthy', 'pass', 'ok', 'connected', 'low', 'covered', 'succeeded', 'acknowledged', 'resolved'],
-  warning: ['medium', 'watch', 'warning', 'partial', 'syncing'],
-  danger: ['high', 'critical', 'blocked', 'failed', 'at risk', 'critical'],
-  info: ['info', 'running'],
+  success: ['healthy', 'pass', 'ok', 'connected', 'covered', 'succeeded', 'resolved', 'on target'],
+  warning: ['medium', 'watch', 'warning', 'partial', 'syncing', 'open', 'at risk', 'needs attention', 'below target'],
+  danger: ['high', 'critical', 'blocked', 'failed'],
+  info: ['info', 'running', 'low'],
+}
+
+export function severityTone(v) {
+  const s = String(v == null ? '' : v).toLowerCase()
+  if (s === 'high' || s === 'critical') return 'danger'
+  if (s === 'medium') return 'warning'
+  if (s === 'low') return 'info'
+  return toneFor(v)
+}
+
+export function statusTone(v) {
+  const s = String(v == null ? '' : v).toLowerCase()
+  if (['failed', 'blocked', 'critical'].includes(s)) return 'danger'
+  if (['succeeded', 'pass', 'acknowledged', 'resolved', 'connected', 'healthy', 'executed'].includes(s)) return 'success'
+  if (['running', 'syncing', 'reviewed', 'approved'].includes(s)) return 'info'
+  if (['open', 'medium', 'watch', 'warning', 'partial', 'never_run'].includes(s)) return 'warning'
+  if (['pending', 'rejected', 'expired'].includes(s)) return 'muted'
+  return toneFor(v)
 }
 
 export function toneFor(value) {
@@ -61,13 +79,14 @@ export function Card({ title, action, children }) {
   )
 }
 
-export function KpiCard({ label, value, unit, sub, tone }) {
+export function KpiCard({ label, value, unit, sub, tone, delta, hint }) {
   return (
     <div className="sci-card">
       <div className="sci-kpi-label">{label}</div>
-      <div className="metric">{value}{unit && <small style={{ fontWeight: 400 }}> {unit}</small>}</div>
+      <div className="metric" title={hint}>{value}{unit && <small style={{ fontWeight: 400 }}> {unit}</small>}</div>
+      {delta && <div className="sci-kpi-sub">{delta}</div>}
       {sub && <div className="sci-kpi-sub">{sub}</div>}
-      {tone && <div style={{ marginTop: 'var(--space-2)' }}><Badge tone={tone}>{tone}</Badge></div>}
+      {tone && <div style={{ marginTop: 'var(--space-2)' }}><Badge tone={tone}>{tone === 'success' ? 'On track' : tone === 'warning' ? 'Needs attention' : tone === 'danger' ? 'At risk' : tone}</Badge></div>}
     </div>
   )
 }

@@ -27,18 +27,20 @@ def get_runs(source: str = "", status: str = "", limit: int = 50, offset: int = 
 
 
 class TriggerIn(BaseModel):
-    src: str = "data/generated/seed-7"
+    src: str = "DataCo"
     batch: str = ""
 
 
 @router.post("/trigger", dependencies=[Depends(require_perm("etl:trigger")), CsrfChecked])
 def post_trigger(body: TriggerIn, actor: dict = Depends(current_user)) -> dict:
-    audit(str(actor["uid"]), "ETL_STARTED", f"src={body.src}")
+    audit(str(actor["uid"]), "ETL_STARTED", f"Source {body.src}")
     try:
         result = trigger(body.src, config.REPO, config.WAREHOUSE_DB, body.batch or "")
     except ValueError as e:
         audit(str(actor["uid"]), "ETL_FAILED", str(e)[:200])
         raise HTTPException(status_code=422, detail=str(e))
+    stats = result.get("stats", {})
+    rows = sum(s.get("accepted", 0) for s in stats.values()) if stats else 0
     audit(str(actor["uid"]), "ETL_COMPLETED",
-          f"run={result['run_id']} quarantined={result['quarantined']}")
+          f"Source {body.src} · {rows} rows accepted · {result.get('quarantined', 0)} quarantined")
     return result

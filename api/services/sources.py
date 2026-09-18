@@ -9,7 +9,7 @@ import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 
-SOURCES = ["products", "suppliers", "warehouses", "customers", "carriers",
+SOURCES = ["dataco", "products", "suppliers", "warehouses", "customers", "carriers",
            "purchase_orders", "po_lines", "sales_orders", "so_lines",
            "inventory_snapshots", "movements", "shipments", "deliveries", "returns"]
 
@@ -44,7 +44,22 @@ ALLOWED_MIME = frozenset({
 
 def source_status(con: sqlite3.Connection) -> list[dict]:
     out = []
+    try:
+        meta = con.execute(
+            "SELECT source_name, source_url, dataset_start, dataset_end, rows,"
+            " last_processed, last_run_id, last_status FROM dataco_source_meta WHERE id=1").fetchone()
+    except Exception:  # noqa: BLE001 - pre-DataCo DBs
+        meta = None
+    if meta:
+        out.append({"name": "dataco", "type": "dataco_csv", "display": meta[0], "url": meta[1],
+                    "dataset_period": f"{meta[2]}..{meta[3]}", "rows": meta[4],
+                    "status": meta[7] or "never_run", "last_run": meta[5],
+                    "last_records": meta[4], "last_failure": None,
+                    "watermark": None, "required_columns": ["Order Id", "Order Item Id",
+                    "order date (DateOrders)", "shipping date (DateOrders)", "Delivery Status"]})
     for name in SOURCES:
+        if name == "dataco":
+            continue
         last = con.execute(
             "SELECT status, ended_at, rows_accepted FROM etl_execution_log WHERE source=? "
             "ORDER BY ended_at DESC LIMIT 1", (name,)).fetchone()

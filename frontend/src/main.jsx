@@ -5,12 +5,10 @@ import './theme.css'
 import Login from './Login.jsx'
 import Shell from './Shell.jsx'
 import { NotFound, ErrorBoundary, useSession } from './hooks.jsx'
-import { Admin, Alerts, Etl, Forecasts, Inventory, Logistics, Overview, Quality, Recommendations, Risks, Sources, Suppliers } from './pages.jsx'
+import { Admin, Alerts, Etl, Forecasts, Logistics, Overview, Quality, Recommendations, Risks, Sources } from './pages.jsx'
 
 const ROUTES = [
   ['/', <Overview />],
-  ['/inventory', <Inventory />],
-  ['/suppliers', <Suppliers />],
   ['/logistics', <Logistics />],
   ['/forecasts', <Forecasts />],
   ['/risks', <Risks />],

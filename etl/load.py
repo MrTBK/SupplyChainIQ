@@ -227,6 +227,10 @@ def load_batch(src: Path, db: Path, batch: str) -> dict:
             continue
         ensure_date(con, r["snapshot_date"])
         oh, res = int(r["on_hand"]), int(r["reserved"])
+        if oh < 0 or res < 0 or res > oh:
+            quarantine(con, run_id, "snapshots", r["snapshot_date"], "R02", "negative/reserved-exceeds stock", r)
+            rej += 1
+            continue
         con.execute("INSERT OR IGNORE INTO fact_inventory_snapshot VALUES (NULL,?,?,?,?,?,?,?)",
                     (r["snapshot_date"], sk(pmap, r["product_id"]), sk(wmap, r["warehouse_id"]),
                      oh, res, oh - res, pcost.get(r["product_id"], 0)))

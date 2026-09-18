@@ -50,7 +50,7 @@ function Axes({ w, h, pad, max, ticks = 4, formatY }) {
 }
 
 /** Multi-series line chart with optional projection tail (dashed copper). */
-export function LineChart({ title, series, labels, projectionFrom, height = 220, formatY, emptyText = 'Not enough data yet.' }) {
+export function LineChart({ title = 'Series', series, labels, projectionFrom, height = 220, formatY, emptyText = 'Not enough data yet.' }) {
   const w = 560
   const h = height
   const pad = { t: 10, r: 12, b: 26, l: 44 }
